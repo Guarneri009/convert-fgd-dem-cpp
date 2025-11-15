@@ -71,6 +71,17 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Enable Link-Time Optimization (LTO)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 
+# Parallel LTO compilation (suppress serial compilation warning)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+        target_link_options(${PROJECT_NAME} PRIVATE
+            $<$<CONFIG:Release>:-flto=${N}>
+        )
+    endif()
+endif()
+
 # Link TBB for parallel execution support
 find_package(TBB QUIET)
 if(TBB_FOUND)
