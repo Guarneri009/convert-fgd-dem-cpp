@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.16)
 project(convert_fgd_dem_cpp VERSION 1.0.0 LANGUAGES CXX)
 
+# Recommend Ninja for faster builds
+if(NOT CMAKE_GENERATOR)
+    find_program(NINJA_EXECUTABLE ninja)
+    if(NINJA_EXECUTABLE)
+        message(STATUS "Ninja found, recommending for faster builds. Use: cmake -G Ninja -B build")
+    endif()
+endif()
+
 # C++20 standard (limited features for GCC 11)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

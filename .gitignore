@@ -11,4 +11,5 @@ build-cpu/
 dem_small/
 *.zip
 *.tif.zip.*
-.log
+*.log
+*.aux.xml
