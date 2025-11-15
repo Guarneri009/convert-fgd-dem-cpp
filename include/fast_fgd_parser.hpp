@@ -144,6 +144,8 @@ class FastFGDParser {
 
         // Parse second double
         auto [p2, ec2] = std::from_chars(ptr, content_end, val2);
+        if (ec2 != std::errc{})
+            return content_end;
 
         return content_end;
     }
@@ -176,6 +178,8 @@ class FastFGDParser {
 
         // Parse second int
         auto [p2, ec2] = std::from_chars(ptr, content_end, val2);
+        if (ec2 != std::errc{})
+            return content_end;
 
         return content_end;
     }

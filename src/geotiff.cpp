@@ -104,15 +104,16 @@ void GeoTiff::write_raster_bands(bool rgbify) {
             }
         }
 
-        pImpl->dataset->GetRasterBand(1)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
+        CPLErr err1 = pImpl->dataset->GetRasterBand(1)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
                                                    red_band.data(), pImpl->x_length,
                                                    pImpl->y_length, GDT_Byte, 0, 0);
-        pImpl->dataset->GetRasterBand(2)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
+        CPLErr err2 = pImpl->dataset->GetRasterBand(2)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
                                                    green_band.data(), pImpl->x_length,
                                                    pImpl->y_length, GDT_Byte, 0, 0);
-        pImpl->dataset->GetRasterBand(3)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
+        CPLErr err3 = pImpl->dataset->GetRasterBand(3)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
                                                    blue_band.data(), pImpl->x_length,
                                                    pImpl->y_length, GDT_Byte, 0, 0);
+        (void)err1; (void)err2; (void)err3;  // Suppress unused variable warning if not checking
     } else {
         // Single band float32 - optimized conversion
         std::vector<float> flat_array(pImpl->x_length * pImpl->y_length);
@@ -143,9 +144,10 @@ void GeoTiff::write_raster_bands(bool rgbify) {
             idx += row_size;
         }
 
-        pImpl->dataset->GetRasterBand(1)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
+        CPLErr err = pImpl->dataset->GetRasterBand(1)->RasterIO(GF_Write, 0, 0, pImpl->x_length, pImpl->y_length,
                                                    flat_array.data(), pImpl->x_length,
                                                    pImpl->y_length, GDT_Float32, 0, 0);
+        (void)err;  // Suppress unused variable warning if not checking
 
         // Set NoData value
         pImpl->dataset->GetRasterBand(1)->SetNoDataValue(-9999.0);
