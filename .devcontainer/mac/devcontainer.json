@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+{
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		// "--gpus",
+		// "all"
+	],
+	"hostRequirements": {
+		"gpu": "optional"
+	},
+	"workspaceFolder": "/workspaces",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	//"postCreateCommand": ".devcontainer/cuda12.2/postCreateCommand.sh",
+	// Configure tooerl-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	//"remoteUser": "root",
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"mhutchie.git-graph",
+				"donjayamanne.githistory",
+				"GitHub.copilot",
+				"GitHub.vscode-pull-request-github",
+				"Anthropic.claude-code",
+				"ms-vscode.cpptools-extension-pack"
+			]
+		}
+	},
+}

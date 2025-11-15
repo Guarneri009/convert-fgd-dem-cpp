@@ -1,0 +1,14 @@
+.DS_Store
+build/
+extracted/
+output/
+data_5m/
+output-cpp/
+dem/
+out/
+*.tif
+build-cpu/
+dem_small/
+*.zip
+*.tif.zip.*
+.log
