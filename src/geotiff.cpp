@@ -10,9 +10,15 @@
 #include <execution>
 #include <iostream>
 
-// SIMD intrinsics for x86_64
+// Platform detection for SIMD intrinsics
 #if defined(__x86_64__) || defined(_M_X64)
-#    include <immintrin.h>
+#    if defined(__AVX2__)
+#        define HAS_AVX2 1
+#        include <immintrin.h>
+#    endif
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#    define HAS_NEON 1
+#    include <arm_neon.h>
 #endif
 
 namespace fgd_converter {
@@ -123,13 +129,25 @@ void GeoTiff::write_raster_bands(bool rgbify) {
         for (const auto &row : pImpl->np_array) {
             const size_t row_size = row.size();
 
-#if defined(__AVX2__) && defined(__x86_64__)
+#if defined(HAS_AVX2)
             // AVX2 SIMD conversion (4 doubles at a time)
             size_t i = 0;
             for (; i + 4 <= row_size; i += 4) {
                 __m256d src = _mm256_loadu_pd(&row[i]);
                 __m128 dst = _mm256_cvtpd_ps(src);
                 _mm_storeu_ps(&flat_array[idx + i], dst);
+            }
+            // Handle remaining elements
+            for (; i < row_size; ++i) {
+                flat_array[idx + i] = static_cast<float>(row[i]);
+            }
+#elif defined(HAS_NEON)
+            // NEON SIMD conversion (2 doubles at a time)
+            size_t i = 0;
+            for (; i + 2 <= row_size; i += 2) {
+                float64x2_t src = vld1q_f64(&row[i]);
+                float32x2_t dst = vcvt_f32_f64(src);
+                vst1_f32(&flat_array[idx + i], dst);
             }
             // Handle remaining elements
             for (; i < row_size; ++i) {

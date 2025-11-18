@@ -10,10 +10,15 @@
 
 #include "geotiff.hpp"
 
-// SIMD intrinsics (if available)
+// Platform detection for SIMD intrinsics
 #if defined(__x86_64__) || defined(_M_X64)
-#    include <immintrin.h>
-#    define HAS_AVX2 1
+#    if defined(__AVX2__)
+#        define HAS_AVX2 1
+#        include <immintrin.h>
+#    endif
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#    define HAS_NEON 1
+#    include <arm_neon.h>
 #endif
 
 namespace fgd_converter {

@@ -73,8 +73,27 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wpedantic
     -Wno-unused-parameter
     $<$<CONFIG:Debug>:-g -O0>
-    $<$<CONFIG:Release>:-O3 -march=native -mavx2 -mfma -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer>
 )
+
+# Platform-specific Release optimizations
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+        # x86_64 specific optimizations with AVX2
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -O3 -march=native -mavx2 -mfma -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer
+        )
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+        # ARM64 (Apple Silicon / M1/M2/M3) specific optimizations with NEON
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -O3 -mcpu=apple-m1 -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer
+        )
+    else()
+        # Generic optimizations for other architectures
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -O3 -march=native -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer
+        )
+    endif()
+endif()
 
 # Enable Link-Time Optimization (LTO)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
