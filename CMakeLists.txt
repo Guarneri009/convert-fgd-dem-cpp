@@ -19,8 +19,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Find required packages
 find_package(Threads REQUIRED)
-find_package(GDAL REQUIRED)
 find_package(PkgConfig REQUIRED)
+
+# Find GDAL using pkg-config (more reliable on macOS with Homebrew)
+pkg_check_modules(GDAL REQUIRED gdal)
+
+# Store as standard GDAL variables for compatibility
+set(GDAL_LIBRARIES ${GDAL_LIBRARIES})
+set(GDAL_INCLUDE_DIRS ${GDAL_INCLUDE_DIRS})
 
 # Find libzip using pkg-config
 pkg_check_modules(LIBZIP REQUIRED libzip)
@@ -57,7 +63,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
 )
 
-# Link libraries
+# Link libraries with proper library directories
+target_link_directories(${PROJECT_NAME} PRIVATE
+    ${GDAL_LIBRARY_DIRS}
+    ${LIBZIP_LIBRARY_DIRS}
+)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${GDAL_LIBRARIES}
     ${LIBZIP_LIBRARIES}
@@ -103,9 +114,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     include(ProcessorCount)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
-        target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:-flto=${N}>
-        )
+        # AppleClang doesn't support -flto=N syntax, only GCC does
+        if(NOT CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+            target_link_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Release>:-flto=${N}>
+            )
+        endif()
     endif()
 endif()
 

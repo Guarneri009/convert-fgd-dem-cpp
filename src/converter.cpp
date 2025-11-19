@@ -149,7 +149,7 @@ bool Converter::make_data_for_geotiff(std::vector<std::vector<double>> &np_array
     auto np_array_list = dem_->get_np_array_list();
 
     if (meta_data_list.empty() || np_array_list.empty()) {
-        ec = std::make_error_code(std::errc::no_message_available);
+        ec = std::make_error_code(std::errc::no_such_file_or_directory);
         return false;
     }
 

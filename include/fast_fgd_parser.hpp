@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <charconv>
+#include <cstdlib>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -132,20 +133,39 @@ class FastFGDParser {
         }
 
         // Parse first double
+#if defined(__APPLE__) || !defined(__cpp_lib_to_chars) || __cpp_lib_to_chars < 201611L
+        // macOS/AppleClang doesn't support std::from_chars for floating-point
+        std::string temp_str1(ptr, content_end - ptr);
+        char* end_ptr1;
+        val1 = std::strtod(temp_str1.c_str(), &end_ptr1);
+        if (end_ptr1 == temp_str1.c_str())
+            return content_end;
+        ptr += (end_ptr1 - temp_str1.c_str());
+#else
+        // Use std::from_chars on platforms that support it (Linux/GCC)
         auto [p1, ec1] = std::from_chars(ptr, content_end, val1);
         if (ec1 != std::errc{})
             return content_end;
+        ptr = p1;
+#endif
 
         // Skip whitespace between values
-        ptr = p1;
         while (ptr < content_end && (*ptr == ' ' || *ptr == '\n' || *ptr == '\r' || *ptr == '\t')) {
             ++ptr;
         }
 
         // Parse second double
+#if defined(__APPLE__) || !defined(__cpp_lib_to_chars) || __cpp_lib_to_chars < 201611L
+        std::string temp_str2(ptr, content_end - ptr);
+        char* end_ptr2;
+        val2 = std::strtod(temp_str2.c_str(), &end_ptr2);
+        if (end_ptr2 == temp_str2.c_str())
+            return content_end;
+#else
         auto [p2, ec2] = std::from_chars(ptr, content_end, val2);
         if (ec2 != std::errc{})
             return content_end;
+#endif
 
         return content_end;
     }
@@ -245,11 +265,21 @@ class FastFGDParser {
                 ++value_end;
             }
 
-            // Parse the value using std::from_chars
+            // Parse the value
             double value;
+#if defined(__APPLE__) || !defined(__cpp_lib_to_chars) || __cpp_lib_to_chars < 201611L
+            // macOS/AppleClang doesn't support std::from_chars for floating-point
+            std::string temp_str(value_start, value_end - value_start);
+            char* end_ptr;
+            value = std::strtod(temp_str.c_str(), &end_ptr);
+            bool parse_ok = (end_ptr != temp_str.c_str());
+#else
+            // Use std::from_chars on platforms that support it (Linux/GCC)
             auto [p, ec] = std::from_chars(value_start, value_end, value);
+            bool parse_ok = (ec == std::errc{});
+#endif
 
-            if (ec == std::errc{}) {
+            if (parse_ok) {
                 // Handle sea points if needed
                 if (sea_at_zero && value <= -9999.0 && is_sea_type(type)) {
                     elevation_list.push_back(0.0);

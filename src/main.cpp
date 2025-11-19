@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <cxxopts.hpp>
+#ifndef __APPLE__
 #include <execution>
+#endif
 #include <iostream>
 #include <mutex>
 #include <sstream>
@@ -122,6 +124,24 @@ int main(int argc, char *argv[]) {
         // Process all zips in parallel
         std::mutex cout_mutex;  // Protect std::cout from race conditions
 
+#ifdef __APPLE__
+        // macOS doesn't support std::execution::par, use TBB instead
+        tbb::parallel_for_each(nested_zips, [&](const fs::path &zip_path) {
+            fs::path output_tif = output_folder / zip_path.stem();
+            output_tif.replace_extension(".tif");
+
+            {
+                std::lock_guard<std::mutex> lock(cout_mutex);
+                std::stringstream ss;
+                ss << "Converting " << zip_path.filename().string() << " -> "
+                   << output_tif.filename().string();
+                std::cout << ss.str() << "\n";
+            }
+
+            process_zip(zip_path, output_folder, output_epsg, rgbify, sea_at_zero);
+        });
+#else
+        // Use parallel execution on Linux
         std::for_each(std::execution::par, nested_zips.begin(), nested_zips.end(),
                       [&](const fs::path &zip_path) {
                           fs::path output_tif = output_folder / zip_path.stem();
@@ -137,6 +157,7 @@ int main(int argc, char *argv[]) {
 
                           process_zip(zip_path, output_folder, output_epsg, rgbify, sea_at_zero);
                       });
+#endif
 
         std::cout << "Conversion complete.\n";
 

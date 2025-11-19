@@ -1,0 +1,947 @@
+=========================================
+Building optimized version (Release)
+=========================================
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found GDAL: /Library/Frameworks/GDAL.framework (found version "2.4.1")
+-- Found PkgConfig: /opt/homebrew/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'libzip'
+--   Found libzip, version 1.11.4
+-- TBB Found: Parallel execution enabled
+-- Performing Test HAS_CXX20
+-- Performing Test HAS_CXX20 - Success
+-- 
+-- === Configuration Summary ===
+-- C++ Standard: 20
+-- Build Type: Release
+-- Compiler: AppleClang 17.0.0.17000013
+-- GDAL Version: 2.4.1
+-- LibZip: Found
+-- Install Prefix: /usr/local
+-- =============================
+-- 
+-- Configuring done (1.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/build
+[1/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/xml_parser.cpp.o
+FAILED: [code=1] CMakeFiles/convert_fgd_dem_cpp.dir/src/xml_parser.cpp.o 
+/usr/bin/c++  -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include -I/Library/Frameworks/GDAL.framework/Headers -I/opt/homebrew/Cellar/libzip/1.11.4/include -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/build/_deps/cxxopts-src/include -F/Library/Frameworks -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -arch arm64 -Wall -Wextra -Wpedantic -Wno-unused-parameter -O3 -mcpu=apple-m1 -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer -MD -MT CMakeFiles/convert_fgd_dem_cpp.dir/src/xml_parser.cpp.o -MF CMakeFiles/convert_fgd_dem_cpp.dir/src/xml_parser.cpp.o.d -o CMakeFiles/convert_fgd_dem_cpp.dir/src/xml_parser.cpp.o -c /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/xml_parser.cpp
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/xml_parser.cpp:1:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/xml_parser.hpp:125:28: error: call to deleted function 'from_chars'
+  125 |             auto [p, ec] = std::from_chars(value_start, value_end, value);
+      |                            ^~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:38:19: note: candidate function has been explicitly deleted
+   38 | from_chars_result from_chars(const char*, const char*, bool, int = 10) = delete;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:224:1: note: candidate template ignored: requirement 'is_integral<double>::value' was not satisfied [with _Tp = double]
+  224 | from_chars(const char* __first, const char* __last, _Tp& __value) {
+      | ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:230:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  230 | from_chars(const char* __first, const char* __last, _Tp& __value, int __base) {
+      | ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/xml_parser.cpp:5:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/fast_fgd_parser.hpp:135:26: error: call to deleted function 'from_chars'
+  135 |         auto [p1, ec1] = std::from_chars(ptr, content_end, val1);
+      |                          ^~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:38:19: note: candidate function has been explicitly deleted
+   38 | from_chars_result from_chars(const char*, const char*, bool, int = 10) = delete;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:224:1: note: candidate template ignored: requirement 'is_integral<double>::value' was not satisfied [with _Tp = double]
+  224 | from_chars(const char* __first, const char* __last, _Tp& __value) {
+      | ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:230:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  230 | from_chars(const char* __first, const char* __last, _Tp& __value, int __base) {
+      | ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/xml_parser.cpp:5:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/fast_fgd_parser.hpp:146:26: error: call to deleted function 'from_chars'
+  146 |         auto [p2, ec2] = std::from_chars(ptr, content_end, val2);
+      |                          ^~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:38:19: note: candidate function has been explicitly deleted
+   38 | from_chars_result from_chars(const char*, const char*, bool, int = 10) = delete;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:224:1: note: candidate template ignored: requirement 'is_integral<double>::value' was not satisfied [with _Tp = double]
+  224 | from_chars(const char* __first, const char* __last, _Tp& __value) {
+      | ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:230:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  230 | from_chars(const char* __first, const char* __last, _Tp& __value, int __base) {
+      | ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/xml_parser.cpp:5:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/fast_fgd_parser.hpp:250:28: error: call to deleted function 'from_chars'
+  250 |             auto [p, ec] = std::from_chars(value_start, value_end, value);
+      |                            ^~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:38:19: note: candidate function has been explicitly deleted
+   38 | from_chars_result from_chars(const char*, const char*, bool, int = 10) = delete;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:224:1: note: candidate template ignored: requirement 'is_integral<double>::value' was not satisfied [with _Tp = double]
+  224 | from_chars(const char* __first, const char* __last, _Tp& __value) {
+      | ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:230:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  230 | from_chars(const char* __first, const char* __last, _Tp& __value, int __base) {
+      | ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4 errors generated.
+[2/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/dem.cpp.o
+FAILED: [code=1] CMakeFiles/convert_fgd_dem_cpp.dir/src/dem.cpp.o 
+/usr/bin/c++  -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include -I/Library/Frameworks/GDAL.framework/Headers -I/opt/homebrew/Cellar/libzip/1.11.4/include -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/build/_deps/cxxopts-src/include -F/Library/Frameworks -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -arch arm64 -Wall -Wextra -Wpedantic -Wno-unused-parameter -O3 -mcpu=apple-m1 -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer -MD -MT CMakeFiles/convert_fgd_dem_cpp.dir/src/dem.cpp.o -MF CMakeFiles/convert_fgd_dem_cpp.dir/src/dem.cpp.o.d -o CMakeFiles/convert_fgd_dem_cpp.dir/src/dem.cpp.o -c /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/dem.cpp
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/dem.cpp:15:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/xml_parser.hpp:125:28: error: call to deleted function 'from_chars'
+  125 |             auto [p, ec] = std::from_chars(value_start, value_end, value);
+      |                            ^~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:38:19: note: candidate function has been explicitly deleted
+   38 | from_chars_result from_chars(const char*, const char*, bool, int = 10) = delete;
+      |                   ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:224:1: note: candidate template ignored: requirement 'is_integral<double>::value' was not satisfied [with _Tp = double]
+  224 | from_chars(const char* __first, const char* __last, _Tp& __value) {
+      | ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/from_chars_integral.h:230:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  230 | from_chars(const char* __first, const char* __last, _Tp& __value, int __base) {
+      | ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/dem.cpp:177:35: error: no member named 'par' in namespace 'std::execution'
+  177 |     std::for_each(std::execution::par, indices.begin(), indices.end(), [this](size_t i) {
+      |                   ~~~~~~~~~~~~~~~~^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/dem.cpp:248:35: error: no member named 'par' in namespace 'std::execution'
+  248 |     std::for_each(std::execution::par, indices.begin(), indices.end(),
+      |                   ~~~~~~~~~~~~~~~~^
+3 errors generated.
+[3/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/converter.cpp.o
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/converter.cpp:152:46: warning: 'no_message_available' is deprecated [-Wdeprecated-declarations]
+  152 |         ec = std::make_error_code(std::errc::no_message_available);
+      |                                              ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__system_error/errc.h:185:26: note: 'no_message_available' has been explicitly marked deprecated here
+  185 |     no_message_available _LIBCPP_DEPRECATED =
+      |                          ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+  696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+      |                                                 ^
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/converter.cpp:1:
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include/converter.hpp:44:10: warning: private field 'process_interrupted_' is not used [-Wunused-private-field]
+   44 |     bool process_interrupted_{false};
+      |          ^
+2 warnings generated.
+[4/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/zip_handler.cpp.o
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/zip_handler.cpp:3:
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:318:11: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  318 |     char *_Nullable str; /* string representation or NULL */
+      |           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:333:17: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  333 |     const char *_Nullable name;     /* name of the file */
+      |                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:345:18: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  345 |     zip_uint8_t *_Nonnull data;
+      |                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:380:50: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  380 | typedef zip_int64_t (*zip_source_callback)(void *_Nullable, void *_Nullable, zip_uint64_t, zip_source_cmd_t);
+      |                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:380:67: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  380 | typedef zip_int64_t (*zip_source_callback)(void *_Nullable, void *_Nullable, zip_uint64_t, zip_source_cmd_t);
+      |                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:381:66: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  381 | typedef zip_int64_t (*zip_source_layered_callback)(zip_source_t *_Nonnull, void *_Nullable, void *_Nullable, zip_uint64_t, enum zip_source_cmd);
+      |                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:381:82: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  381 | typedef zip_int64_t (*zip_source_layered_callback)(zip_source_t *_Nonnull, void *_Nullable, void *_Nullable, zip_uint64_t, enum zip_source_cmd);
+      |                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:381:99: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  381 | typedef zip_int64_t (*zip_source_layered_callback)(zip_source_t *_Nonnull, void *_Nullable, void *_Nullable, zip_uint64_t, enum zip_source_cmd);
+      |                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:382:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  382 | typedef void (*zip_progress_callback)(zip_t *_Nonnull, double, void *_Nullable);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:382:70: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  382 | typedef void (*zip_progress_callback)(zip_t *_Nonnull, double, void *_Nullable);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:383:43: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  383 | typedef int (*zip_cancel_callback)(zip_t *_Nonnull, void *_Nullable);
+      |                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:383:59: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  383 | typedef int (*zip_cancel_callback)(zip_t *_Nonnull, void *_Nullable);
+      |                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:389:129: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  389 | ZIP_DEPRECATED("use 'zip_register_progress_callback_with_state' instead") ZIP_EXTERN void zip_register_progress_callback(zip_t *_Nonnull, zip_progress_callback_t _Nullable);
+      |                                                                                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:389:163: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  389 | ZIP_DEPRECATED("use 'zip_register_progress_callback_with_state' instead") ZIP_EXTERN void zip_register_progress_callback(zip_t *_Nonnull, zip_progress_callback_t _Nullable);
+      |                                                                                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:391:84: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  391 | ZIP_DEPRECATED("use 'zip_file_add' instead") ZIP_EXTERN zip_int64_t zip_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull);
+      |                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:391:106: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  391 | ZIP_DEPRECATED("use 'zip_file_add' instead") ZIP_EXTERN zip_int64_t zip_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull);
+      |                                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:391:130: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  391 | ZIP_DEPRECATED("use 'zip_file_add' instead") ZIP_EXTERN zip_int64_t zip_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull);
+      |                                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:392:87: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  392 | ZIP_DEPRECATED("use 'zip_dir_add' instead") ZIP_EXTERN zip_int64_t zip_add_dir(zip_t *_Nonnull, const char *_Nonnull);
+      |                                                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:392:109: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  392 | ZIP_DEPRECATED("use 'zip_dir_add' instead") ZIP_EXTERN zip_int64_t zip_add_dir(zip_t *_Nonnull, const char *_Nonnull);
+      |                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:393:77: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  393 | ZIP_DEPRECATED("use 'zip_file_get_comment' instead") ZIP_EXTERN const char *_Nullable zip_get_file_comment(zip_t *_Nonnull, zip_uint64_t, int *_Nullable, int);
+      |                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:393:115: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  393 | ZIP_DEPRECATED("use 'zip_file_get_comment' instead") ZIP_EXTERN const char *_Nullable zip_get_file_comment(zip_t *_Nonnull, zip_uint64_t, int *_Nullable, int);
+      |                                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:393:144: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  393 | ZIP_DEPRECATED("use 'zip_file_get_comment' instead") ZIP_EXTERN const char *_Nullable zip_get_file_comment(zip_t *_Nonnull, zip_uint64_t, int *_Nullable, int);
+      |                                                                                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:394:93: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  394 | ZIP_DEPRECATED("use 'zip_get_num_entries' instead") ZIP_EXTERN int zip_get_num_files(zip_t *_Nonnull);
+      |                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:395:82: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  395 | ZIP_DEPRECATED("use 'zip_file_rename' instead") ZIP_EXTERN int zip_rename(zip_t *_Nonnull, zip_uint64_t, const char *_Nonnull);
+      |                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:395:118: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  395 | ZIP_DEPRECATED("use 'zip_file_rename' instead") ZIP_EXTERN int zip_rename(zip_t *_Nonnull, zip_uint64_t, const char *_Nonnull);
+      |                                                                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:396:84: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  396 | ZIP_DEPRECATED("use 'zip_file_replace' instead") ZIP_EXTERN int zip_replace(zip_t *_Nonnull, zip_uint64_t, zip_source_t *_Nonnull);
+      |                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:396:122: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  396 | ZIP_DEPRECATED("use 'zip_file_replace' instead") ZIP_EXTERN int zip_replace(zip_t *_Nonnull, zip_uint64_t, zip_source_t *_Nonnull);
+      |                                                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:397:97: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  397 | ZIP_DEPRECATED("use 'zip_file_set_comment' instead") ZIP_EXTERN int zip_set_file_comment(zip_t *_Nonnull, zip_uint64_t, const char *_Nullable, int);
+      |                                                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:397:133: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  397 | ZIP_DEPRECATED("use 'zip_file_set_comment' instead") ZIP_EXTERN int zip_set_file_comment(zip_t *_Nonnull, zip_uint64_t, const char *_Nullable, int);
+      |                                                                                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:399:84: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  399 | ZIP_DEPRECATED("use 'zip_get_error' instead") ZIP_EXTERN void zip_error_get(zip_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:399:99: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  399 | ZIP_DEPRECATED("use 'zip_get_error' instead") ZIP_EXTERN void zip_error_get(zip_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:399:115: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  399 | ZIP_DEPRECATED("use 'zip_get_error' instead") ZIP_EXTERN void zip_error_get(zip_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:400:90: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  400 | ZIP_DEPRECATED("use 'zip_error_strerror' instead") ZIP_EXTERN int zip_error_to_str(char *_Nonnull, zip_uint64_t, int, int);
+      |                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:401:99: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  401 | ZIP_DEPRECATED("use 'zip_file_get_error' instead") ZIP_EXTERN void zip_file_error_get(zip_file_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:401:114: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  401 | ZIP_DEPRECATED("use 'zip_file_get_error' instead") ZIP_EXTERN void zip_file_error_get(zip_file_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:401:130: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  401 | ZIP_DEPRECATED("use 'zip_file_get_error' instead") ZIP_EXTERN void zip_file_error_get(zip_file_t *_Nonnull, int *_Nullable, int *_Nullable);
+      |                                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:402:78: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  402 | ZIP_DEPRECATED("use 'zip_source_zip_file' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t);
+      |                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:402:110: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  402 | ZIP_DEPRECATED("use 'zip_source_zip_file' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t);
+      |                                                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:402:127: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  402 | ZIP_DEPRECATED("use 'zip_source_zip_file' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t);
+      |                                                                                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:403:85: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  403 | ZIP_DEPRECATED("use 'zip_source_zip_file_create' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:403:124: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  403 | ZIP_DEPRECATED("use 'zip_source_zip_file_create' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:403:201: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  403 | ZIP_DEPRECATED("use 'zip_source_zip_file_create' instead") ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                                                                                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:406:33: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  406 | ZIP_EXTERN int zip_close(zip_t *_Nonnull);
+      |                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:407:34: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  407 | ZIP_EXTERN int zip_delete(zip_t *_Nonnull, zip_uint64_t);
+      |                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:408:43: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  408 | ZIP_EXTERN zip_int64_t zip_dir_add(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:408:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  408 | ZIP_EXTERN zip_int64_t zip_dir_add(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:409:36: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  409 | ZIP_EXTERN void zip_discard(zip_t *_Nonnull);
+      |                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:411:25: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  411 | ZIP_EXTERN zip_error_t *_Nonnull zip_get_error(zip_t *_Nonnull);
+      |                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:411:55: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  411 | ZIP_EXTERN zip_error_t *_Nonnull zip_get_error(zip_t *_Nonnull);
+      |                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:412:40: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  412 | ZIP_EXTERN void zip_error_clear(zip_t *_Nonnull);
+      |                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:413:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  413 | ZIP_EXTERN int zip_error_code_zip(const zip_error_t *_Nonnull);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:414:57: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  414 | ZIP_EXTERN int zip_error_code_system(const zip_error_t *_Nonnull);
+      |                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:415:45: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  415 | ZIP_EXTERN void zip_error_fini(zip_error_t *_Nonnull);
+      |                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:416:45: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  416 | ZIP_EXTERN void zip_error_init(zip_error_t *_Nonnull);
+      |                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:417:55: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  417 | ZIP_EXTERN void zip_error_init_with_code(zip_error_t *_Nonnull, int);
+      |                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:418:44: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  418 | ZIP_EXTERN void zip_error_set(zip_error_t *_Nullable, int, int);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:419:56: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  419 | ZIP_EXTERN void zip_error_set_from_source(zip_error_t *_Nonnull, zip_source_t *_Nullable);
+      |                                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:419:80: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  419 | ZIP_EXTERN void zip_error_set_from_source(zip_error_t *_Nonnull, zip_source_t *_Nullable);
+      |                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:420:24: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  420 | ZIP_EXTERN const char *_Nonnull zip_error_strerror(zip_error_t *_Nonnull);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:420:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  420 | ZIP_EXTERN const char *_Nonnull zip_error_strerror(zip_error_t *_Nonnull);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:421:57: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  421 | ZIP_EXTERN int zip_error_system_type(const zip_error_t *_Nonnull);
+      |                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:422:61: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  422 | ZIP_EXTERN zip_int64_t zip_error_to_data(const zip_error_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:422:77: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  422 | ZIP_EXTERN zip_int64_t zip_error_to_data(const zip_error_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:424:39: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  424 | ZIP_EXTERN int zip_fclose(zip_file_t *_Nonnull);
+      |                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:425:19: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  425 | ZIP_EXTERN zip_t *_Nullable zip_fdopen(int, int, int *_Nullable);
+      |                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:425:55: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  425 | ZIP_EXTERN zip_t *_Nullable zip_fdopen(int, int, int *_Nullable);
+      |                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:426:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  426 | ZIP_EXTERN zip_int64_t zip_file_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull, zip_flags_t);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:426:66: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  426 | ZIP_EXTERN zip_int64_t zip_file_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull, zip_flags_t);
+      |                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:426:90: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  426 | ZIP_EXTERN zip_int64_t zip_file_add(zip_t *_Nonnull, const char *_Nonnull, zip_source_t *_Nonnull, zip_flags_t);
+      |                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:427:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  427 | ZIP_EXTERN void zip_file_attributes_init(zip_file_attributes_t *_Nonnull);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:428:50: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  428 | ZIP_EXTERN void zip_file_error_clear(zip_file_t *_Nonnull);
+      |                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:429:51: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  429 | ZIP_EXTERN int zip_file_extra_field_delete(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_flags_t);
+      |                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:430:57: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  430 | ZIP_EXTERN int zip_file_extra_field_delete_by_id(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, zip_flags_t);
+      |                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:431:48: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  431 | ZIP_EXTERN int zip_file_extra_field_set(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, const zip_uint8_t *_Nullable, zip_uint16_t, zip_flags_t);
+      |                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:431:119: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  431 | ZIP_EXTERN int zip_file_extra_field_set(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, const zip_uint8_t *_Nullable, zip_uint16_t, zip_flags_t);
+      |                                                                                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:432:59: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  432 | ZIP_EXTERN zip_int16_t zip_file_extra_fields_count(zip_t *_Nonnull, zip_uint64_t, zip_flags_t);
+      |                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:433:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  433 | ZIP_EXTERN zip_int16_t zip_file_extra_fields_count_by_id(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_flags_t);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:434:31: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  434 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_uint16_t *_Nullable, zip_flags_t);
+      |                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:434:73: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  434 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_uint16_t *_Nullable, zip_flags_t);
+      |                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:434:125: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  434 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_uint16_t *_Nullable, zip_flags_t);
+      |                                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:434:150: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  434 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_uint16_t *_Nullable, zip_flags_t);
+      |                                                                                                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:435:31: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  435 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get_by_id(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_flags_t);
+      |                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:435:79: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  435 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get_by_id(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_flags_t);
+      |                                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:435:145: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  435 | ZIP_EXTERN const zip_uint8_t *_Nullable zip_file_extra_field_get_by_id(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, zip_uint16_t *_Nullable, zip_flags_t);
+      |                                                                                                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:436:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  436 | ZIP_EXTERN const char *_Nullable zip_file_get_comment(zip_t *_Nonnull, zip_uint64_t, zip_uint32_t *_Nullable, zip_flags_t);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:436:62: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  436 | ZIP_EXTERN const char *_Nullable zip_file_get_comment(zip_t *_Nonnull, zip_uint64_t, zip_uint32_t *_Nullable, zip_flags_t);
+      |                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:436:100: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  436 | ZIP_EXTERN const char *_Nullable zip_file_get_comment(zip_t *_Nonnull, zip_uint64_t, zip_uint32_t *_Nullable, zip_flags_t);
+      |                                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:437:25: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  437 | ZIP_EXTERN zip_error_t *_Nonnull zip_file_get_error(zip_file_t *_Nonnull);
+      |                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:437:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  437 | ZIP_EXTERN zip_error_t *_Nonnull zip_file_get_error(zip_file_t *_Nonnull);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:438:56: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  438 | ZIP_EXTERN int zip_file_get_external_attributes(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint8_t *_Nullable, zip_uint32_t *_Nullable);
+      |                                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:438:106: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  438 | ZIP_EXTERN int zip_file_get_external_attributes(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint8_t *_Nullable, zip_uint32_t *_Nullable);
+      |                                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:438:131: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  438 | ZIP_EXTERN int zip_file_get_external_attributes(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint8_t *_Nullable, zip_uint32_t *_Nullable);
+      |                                                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:439:49: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  439 | ZIP_EXTERN int zip_file_is_seekable(zip_file_t *_Nonnull);
+      |                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:440:39: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  440 | ZIP_EXTERN int zip_file_rename(zip_t *_Nonnull, zip_uint64_t, const char *_Nonnull, zip_flags_t);
+      |                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:440:75: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  440 | ZIP_EXTERN int zip_file_rename(zip_t *_Nonnull, zip_uint64_t, const char *_Nonnull, zip_flags_t);
+      |                                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:441:40: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  441 | ZIP_EXTERN int zip_file_replace(zip_t *_Nonnull, zip_uint64_t, zip_source_t *_Nonnull, zip_flags_t);
+      |                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:441:78: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  441 | ZIP_EXTERN int zip_file_replace(zip_t *_Nonnull, zip_uint64_t, zip_source_t *_Nonnull, zip_flags_t);
+      |                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:442:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  442 | ZIP_EXTERN int zip_file_set_comment(zip_t *_Nonnull, zip_uint64_t, const char *_Nullable, zip_uint16_t, zip_flags_t);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:442:80: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  442 | ZIP_EXTERN int zip_file_set_comment(zip_t *_Nonnull, zip_uint64_t, const char *_Nullable, zip_uint16_t, zip_flags_t);
+      |                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:443:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  443 | ZIP_EXTERN int zip_file_set_dostime(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, zip_uint16_t, zip_flags_t);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:444:47: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  444 | ZIP_EXTERN int zip_file_set_encryption(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, const char *_Nullable);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:444:97: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  444 | ZIP_EXTERN int zip_file_set_encryption(zip_t *_Nonnull, zip_uint64_t, zip_uint16_t, const char *_Nullable);
+      |                                                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:445:56: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  445 | ZIP_EXTERN int zip_file_set_external_attributes(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint8_t, zip_uint32_t);
+      |                                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:446:42: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  446 | ZIP_EXTERN int zip_file_set_mtime(zip_t *_Nonnull, zip_uint64_t, time_t, zip_flags_t);
+      |                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:447:24: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  447 | ZIP_EXTERN const char *_Nonnull zip_file_strerror(zip_file_t *_Nonnull);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:447:63: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  447 | ZIP_EXTERN const char *_Nonnull zip_file_strerror(zip_file_t *_Nonnull);
+      |                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:448:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  448 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:448:51: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  448 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:448:73: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  448 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:449:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  449 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_encrypted(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, const char *_Nullable);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:449:61: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  449 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_encrypted(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, const char *_Nullable);
+      |                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:449:83: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  449 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_encrypted(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, const char *_Nullable);
+      |                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:449:118: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  449 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_encrypted(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, const char *_Nullable);
+      |                                                                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:450:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  450 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_index(zip_t *_Nonnull, zip_uint64_t, zip_flags_t);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:450:57: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  450 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_index(zip_t *_Nonnull, zip_uint64_t, zip_flags_t);
+      |                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:451:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  451 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_index_encrypted(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, const char *_Nullable);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:451:67: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  451 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_index_encrypted(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, const char *_Nullable);
+      |                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:451:116: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  451 | ZIP_EXTERN zip_file_t *_Nullable zip_fopen_index_encrypted(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, const char *_Nullable);
+      |                                                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:452:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  452 | ZIP_EXTERN zip_int64_t zip_fread(zip_file_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:452:62: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  452 | ZIP_EXTERN zip_int64_t zip_fread(zip_file_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:453:45: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  453 | ZIP_EXTERN zip_int8_t zip_fseek(zip_file_t *_Nonnull, zip_int64_t, int);
+      |                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:454:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  454 | ZIP_EXTERN zip_int64_t zip_ftell(zip_file_t *_Nonnull);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:455:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  455 | ZIP_EXTERN const char *_Nullable zip_get_archive_comment(zip_t *_Nonnull, int *_Nullable, zip_flags_t);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:455:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  455 | ZIP_EXTERN const char *_Nullable zip_get_archive_comment(zip_t *_Nonnull, int *_Nullable, zip_flags_t);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:455:80: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  455 | ZIP_EXTERN const char *_Nullable zip_get_archive_comment(zip_t *_Nonnull, int *_Nullable, zip_flags_t);
+      |                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:456:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  456 | ZIP_EXTERN int zip_get_archive_flag(zip_t *_Nonnull, zip_flags_t, zip_flags_t);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:457:24: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  457 | ZIP_EXTERN const char *_Nullable zip_get_name(zip_t *_Nonnull, zip_uint64_t, zip_flags_t);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:457:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  457 | ZIP_EXTERN const char *_Nullable zip_get_name(zip_t *_Nonnull, zip_uint64_t, zip_flags_t);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:458:51: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  458 | ZIP_EXTERN zip_int64_t zip_get_num_entries(zip_t *_Nonnull, zip_flags_t);
+      |                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:459:24: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  459 | ZIP_EXTERN const char *_Nonnull zip_libzip_version(void);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:460:47: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  460 | ZIP_EXTERN zip_int64_t zip_name_locate(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:460:69: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  460 | ZIP_EXTERN zip_int64_t zip_name_locate(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t);
+      |                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:461:19: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  461 | ZIP_EXTERN zip_t *_Nullable zip_open(const char *_Nonnull, int, int *_Nullable);
+      |                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:461:50: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  461 | ZIP_EXTERN zip_t *_Nullable zip_open(const char *_Nonnull, int, int *_Nullable);
+      |                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:461:70: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  461 | ZIP_EXTERN zip_t *_Nullable zip_open(const char *_Nonnull, int, int *_Nullable);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:462:19: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  462 | ZIP_EXTERN zip_t *_Nullable zip_open_from_source(zip_source_t *_Nonnull, int, zip_error_t *_Nullable);
+      |                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:462:64: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  462 | ZIP_EXTERN zip_t *_Nullable zip_open_from_source(zip_source_t *_Nonnull, int, zip_error_t *_Nullable);
+      |                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:462:92: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  462 | ZIP_EXTERN zip_t *_Nullable zip_open_from_source(zip_source_t *_Nonnull, int, zip_error_t *_Nullable);
+      |                                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:463:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  463 | ZIP_EXTERN int zip_register_progress_callback_with_state(zip_t *_Nonnull, double, zip_progress_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:463:105: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  463 | ZIP_EXTERN int zip_register_progress_callback_with_state(zip_t *_Nonnull, double, zip_progress_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:463:123: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  463 | ZIP_EXTERN int zip_register_progress_callback_with_state(zip_t *_Nonnull, double, zip_progress_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:463:140: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  463 | ZIP_EXTERN int zip_register_progress_callback_with_state(zip_t *_Nonnull, double, zip_progress_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:463:158: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  463 | ZIP_EXTERN int zip_register_progress_callback_with_state(zip_t *_Nonnull, double, zip_progress_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:464:63: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  464 | ZIP_EXTERN int zip_register_cancel_callback_with_state(zip_t *_Nonnull, zip_cancel_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:464:93: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  464 | ZIP_EXTERN int zip_register_cancel_callback_with_state(zip_t *_Nonnull, zip_cancel_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:464:111: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  464 | ZIP_EXTERN int zip_register_cancel_callback_with_state(zip_t *_Nonnull, zip_cancel_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:464:128: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  464 | ZIP_EXTERN int zip_register_cancel_callback_with_state(zip_t *_Nonnull, zip_cancel_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:464:146: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  464 | ZIP_EXTERN int zip_register_cancel_callback_with_state(zip_t *_Nonnull, zip_cancel_callback _Nullable, void (*_Nullable)(void *_Nullable), void *_Nullable);
+      |                                                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:465:47: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  465 | ZIP_EXTERN int zip_set_archive_comment(zip_t *_Nonnull, const char *_Nullable, zip_uint16_t);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:465:69: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  465 | ZIP_EXTERN int zip_set_archive_comment(zip_t *_Nonnull, const char *_Nullable, zip_uint16_t);
+      |                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:466:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  466 | ZIP_EXTERN int zip_set_archive_flag(zip_t *_Nonnull, zip_flags_t, int);
+      |                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:467:48: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  467 | ZIP_EXTERN int zip_set_default_password(zip_t *_Nonnull, const char *_Nullable);
+      |                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:467:70: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  467 | ZIP_EXTERN int zip_set_default_password(zip_t *_Nonnull, const char *_Nullable);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:468:48: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  468 | ZIP_EXTERN int zip_set_file_compression(zip_t *_Nonnull, zip_uint64_t, zip_int32_t, zip_uint32_t);
+      |                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:469:53: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  469 | ZIP_EXTERN int zip_source_begin_write(zip_source_t *_Nonnull);
+      |                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:470:61: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  470 | ZIP_EXTERN int zip_source_begin_write_cloning(zip_source_t *_Nonnull, zip_uint64_t);
+      |                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:471:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  471 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer(zip_t *_Nonnull, const void *_Nullable, zip_uint64_t, int);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:471:61: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  471 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer(zip_t *_Nonnull, const void *_Nullable, zip_uint64_t, int);
+      |                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:471:83: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  471 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer(zip_t *_Nonnull, const void *_Nullable, zip_uint64_t, int);
+      |                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:472:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  472 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_create(const void *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:472:73: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  472 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_create(const void *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:472:116: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  472 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_create(const void *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                                                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:473:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  473 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment(zip_t *_Nonnull, const zip_buffer_fragment_t *_Nonnull, zip_uint64_t, int);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:473:70: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  473 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment(zip_t *_Nonnull, const zip_buffer_fragment_t *_Nonnull, zip_uint64_t, int);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:473:109: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  473 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment(zip_t *_Nonnull, const zip_buffer_fragment_t *_Nonnull, zip_uint64_t, int);
+      |                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:474:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  474 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment_create(const zip_buffer_fragment_t *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:474:99: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  474 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment_create(const zip_buffer_fragment_t *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:474:142: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  474 | ZIP_EXTERN zip_source_t *_Nullable zip_source_buffer_fragment_create(const zip_buffer_fragment_t *_Nullable, zip_uint64_t, int, zip_error_t *_Nullable);
+      |                                                                                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:475:47: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  475 | ZIP_EXTERN int zip_source_close(zip_source_t *_Nonnull);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:476:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  476 | ZIP_EXTERN int zip_source_commit_write(zip_source_t *_Nonnull);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:477:25: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  477 | ZIP_EXTERN zip_error_t *_Nonnull zip_source_error(zip_source_t *_Nonnull);
+      |                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:477:65: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  477 | ZIP_EXTERN zip_error_t *_Nonnull zip_source_error(zip_source_t *_Nonnull);
+      |                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:478:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  478 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file(zip_t *_Nonnull, const char *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:478:59: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  478 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file(zip_t *_Nonnull, const char *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:478:81: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  478 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file(zip_t *_Nonnull, const char *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                                                                                 ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:479:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  479 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file_create(const char *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:479:71: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  479 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file_create(const char *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:479:121: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  479 | ZIP_EXTERN zip_source_t *_Nullable zip_source_file_create(const char *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:480:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  480 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep(zip_t *_Nonnull, FILE *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:480:60: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  480 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep(zip_t *_Nonnull, FILE *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:480:76: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  480 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep(zip_t *_Nonnull, FILE *_Nonnull, zip_uint64_t, zip_int64_t);
+      |                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:481:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  481 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep_create(FILE *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:481:66: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  481 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep_create(FILE *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:481:116: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  481 | ZIP_EXTERN zip_source_t *_Nullable zip_source_filep_create(FILE *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:482:47: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  482 | ZIP_EXTERN void zip_source_free(zip_source_t *_Nullable);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:483:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  483 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function(zip_t *_Nonnull, zip_source_callback _Nonnull, void *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:483:63: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  483 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function(zip_t *_Nonnull, zip_source_callback _Nonnull, void *_Nullable);
+      |                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:483:93: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  483 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function(zip_t *_Nonnull, zip_source_callback _Nonnull, void *_Nullable);
+      |                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:483:109: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  483 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function(zip_t *_Nonnull, zip_source_callback _Nonnull, void *_Nullable);
+      |                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:484:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  484 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function_create(zip_source_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:484:83: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  484 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function_create(zip_source_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:484:99: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  484 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function_create(zip_source_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                   ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:484:123: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  484 | ZIP_EXTERN zip_source_t *_Nullable zip_source_function_create(zip_source_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:485:61: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  485 | ZIP_EXTERN int zip_source_get_file_attributes(zip_source_t *_Nonnull, zip_file_attributes_t *_Nonnull);
+      |                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:485:94: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  485 | ZIP_EXTERN int zip_source_get_file_attributes(zip_source_t *_Nonnull, zip_file_attributes_t *_Nonnull);
+      |                                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:486:52: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  486 | ZIP_EXTERN int zip_source_is_deleted(zip_source_t *_Nonnull);
+      |                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:487:53: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  487 | ZIP_EXTERN int zip_source_is_seekable(zip_source_t *_Nonnull);
+      |                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:488:47: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  488 | ZIP_EXTERN void zip_source_keep(zip_source_t *_Nonnull);
+      |                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:489:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  489 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered(zip_t *_Nullable, zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:489:62: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  489 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered(zip_t *_Nullable, zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable);
+      |                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:489:87: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  489 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered(zip_t *_Nullable, zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable);
+      |                                                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:489:125: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  489 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered(zip_t *_Nullable, zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable);
+      |                                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:489:141: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  489 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered(zip_t *_Nullable, zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable);
+      |                                                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:490:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  490 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered_create(zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:490:76: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  490 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered_create(zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:490:114: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  490 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered_create(zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:490:130: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  490 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered_create(zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:490:154: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  490 | ZIP_EXTERN zip_source_t *_Nullable zip_source_layered_create(zip_source_t *_Nonnull, zip_source_layered_callback _Nonnull, void *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:492:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  492 | ZIP_EXTERN int zip_source_open(zip_source_t *_Nonnull);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:493:69: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  493 | ZIP_EXTERN zip_int64_t zip_source_pass_to_lower_layer(zip_source_t *_Nonnull, void *_Nullable, zip_uint64_t, zip_source_cmd_t);
+      |                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:493:85: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  493 | ZIP_EXTERN zip_int64_t zip_source_pass_to_lower_layer(zip_source_t *_Nonnull, void *_Nullable, zip_uint64_t, zip_source_cmd_t);
+      |                                                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:494:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  494 | ZIP_EXTERN zip_int64_t zip_source_read(zip_source_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:494:70: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  494 | ZIP_EXTERN zip_int64_t zip_source_read(zip_source_t *_Nonnull, void *_Nonnull, zip_uint64_t);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:495:57: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  495 | ZIP_EXTERN void zip_source_rollback_write(zip_source_t *_Nonnull);
+      |                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:496:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  496 | ZIP_EXTERN int zip_source_seek(zip_source_t *_Nonnull, zip_int64_t, int);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:497:89: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  497 | ZIP_EXTERN zip_int64_t zip_source_seek_compute_offset(zip_uint64_t, zip_uint64_t, void *_Nonnull, zip_uint64_t, zip_error_t *_Nullable);
+      |                                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:497:126: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  497 | ZIP_EXTERN zip_int64_t zip_source_seek_compute_offset(zip_uint64_t, zip_uint64_t, void *_Nonnull, zip_uint64_t, zip_error_t *_Nullable);
+      |                                                                                                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:498:52: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  498 | ZIP_EXTERN int zip_source_seek_write(zip_source_t *_Nonnull, zip_int64_t, int);
+      |                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:499:46: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  499 | ZIP_EXTERN int zip_source_stat(zip_source_t *_Nonnull, zip_stat_t *_Nonnull);
+      |                                              ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:499:68: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  499 | ZIP_EXTERN int zip_source_stat(zip_source_t *_Nonnull, zip_stat_t *_Nonnull);
+      |                                                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:500:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  500 | ZIP_EXTERN zip_int64_t zip_source_tell(zip_source_t *_Nonnull);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:501:60: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  501 | ZIP_EXTERN zip_int64_t zip_source_tell_write(zip_source_t *_Nonnull);
+      |                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:510:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  510 | ZIP_EXTERN zip_source_t *_Nullable zip_source_window_create(zip_source_t *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:510:75: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  510 | ZIP_EXTERN zip_source_t *_Nullable zip_source_window_create(zip_source_t *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:510:125: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  510 | ZIP_EXTERN zip_source_t *_Nullable zip_source_window_create(zip_source_t *_Nonnull, zip_uint64_t, zip_int64_t, zip_error_t *_Nullable);
+      |                                                                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:511:55: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  511 | ZIP_EXTERN zip_int64_t zip_source_write(zip_source_t *_Nonnull, const void *_Nullable, zip_uint64_t);
+      |                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:511:77: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  511 | ZIP_EXTERN zip_int64_t zip_source_write(zip_source_t *_Nonnull, const void *_Nullable, zip_uint64_t);
+      |                                                                             ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:512:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  512 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:512:63: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  512 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable);
+      |                                                               ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:512:80: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  512 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable);
+      |                                                                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:512:156: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  512 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file(zip_t *_Nonnull, zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable);
+      |                                                                                                                                                            ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:513:26: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  513 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable, zip_error_t *_Nullable);
+      |                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:513:70: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  513 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable, zip_error_t *_Nullable);
+      |                                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:513:146: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  513 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                                                  ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:513:170: warning: type nullability specifier '_Nullable' is a Clang extension [-Wnullability-extension]
+  513 | ZIP_EXTERN zip_source_t *_Nullable zip_source_zip_file_create(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_uint64_t, zip_int64_t, const char *_Nullable, zip_error_t *_Nullable);
+      |                                                                                                                                                                          ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:514:32: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  514 | ZIP_EXTERN int zip_stat(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, zip_stat_t *_Nonnull);
+      |                                ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:514:54: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  514 | ZIP_EXTERN int zip_stat(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, zip_stat_t *_Nonnull);
+      |                                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:514:89: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  514 | ZIP_EXTERN int zip_stat(zip_t *_Nonnull, const char *_Nonnull, zip_flags_t, zip_stat_t *_Nonnull);
+      |                                                                                         ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:515:38: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  515 | ZIP_EXTERN int zip_stat_index(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_stat_t *_Nonnull);
+      |                                      ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:515:87: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  515 | ZIP_EXTERN int zip_stat_index(zip_t *_Nonnull, zip_uint64_t, zip_flags_t, zip_stat_t *_Nonnull);
+      |                                                                                       ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:516:43: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  516 | ZIP_EXTERN void zip_stat_init(zip_stat_t *_Nonnull);
+      |                                           ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:517:24: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  517 | ZIP_EXTERN const char *_Nonnull zip_strerror(zip_t *_Nonnull);
+      |                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:517:53: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  517 | ZIP_EXTERN const char *_Nonnull zip_strerror(zip_t *_Nonnull);
+      |                                                     ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:518:36: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  518 | ZIP_EXTERN int zip_unchange(zip_t *_Nonnull, zip_uint64_t);
+      |                                    ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:519:40: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  519 | ZIP_EXTERN int zip_unchange_all(zip_t *_Nonnull);
+      |                                        ^
+/opt/homebrew/Cellar/libzip/1.11.4/include/zip.h:520:44: warning: type nullability specifier '_Nonnull' is a Clang extension [-Wnullability-extension]
+  520 | ZIP_EXTERN int zip_unchange_archive(zip_t *_Nonnull);
+      |                                            ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/zip_handler.cpp:62:25: warning: variable 'sum' set but not used [-Wunused-but-set-variable]
+   62 |             zip_int64_t sum = 0;
+      |                         ^
+247 warnings generated.
+[5/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/geotiff.cpp.o
+In file included from /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/geotiff.cpp:4:
+In file included from /Library/Frameworks/GDAL.framework/Headers/gdal_priv.h:60:
+In file included from /Library/Frameworks/GDAL.framework/Headers/gdal.h:50:
+In file included from /Library/Frameworks/GDAL.framework/Headers/ogr_api.h:45:
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:61:30: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+   61 |         OGREnvelope() : MinX(std::numeric_limits<double>::infinity()),
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:62:31: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+   62 |                         MaxX(-std::numeric_limits<double>::infinity()),
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:63:30: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+   63 |                         MinY(std::numeric_limits<double>::infinity()),
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:64:31: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+   64 |                         MaxY(-std::numeric_limits<double>::infinity())
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:82:42: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+   82 |     int  IsInit() const { return MinX != std::numeric_limits<double>::infinity(); }
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:68:9: warning: definition of implicit copy assignment operator for 'OGREnvelope' is deprecated because it has a user-provided copy constructor [-Wdeprecated-copy-with-user-provided-copy]
+   68 |         OGREnvelope(const OGREnvelope& oOther) :
+      |         ^
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:122:19: note: in implicit copy assignment operator for 'OGREnvelope' first required here
+  122 |             *this = OGREnvelope();
+      |                   ^
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:164:32: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+  164 |                           MinZ(std::numeric_limits<double>::infinity()),
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:165:33: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+  165 |                           MaxZ(-std::numeric_limits<double>::infinity())
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:182:42: warning: use of infinity is undefined behavior due to the currently enabled floating-point options [-Wnan-infinity-disabled]
+  182 |     int  IsInit() const { return MinX != std::numeric_limits<double>::infinity(); }
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:169:9: warning: definition of implicit copy assignment operator for 'OGREnvelope3D' is deprecated because it has a user-provided copy constructor [-Wdeprecated-copy-with-user-provided-copy]
+  169 |         OGREnvelope3D(const OGREnvelope3D& oOther) :
+      |         ^
+/Library/Frameworks/GDAL.framework/Headers/ogr_core.h:229:19: note: in implicit copy assignment operator for 'OGREnvelope3D' first required here
+  229 |             *this = OGREnvelope3D();
+      |                   ^
+10 warnings generated.
+[6/7] Building CXX object CMakeFiles/convert_fgd_dem_cpp.dir/src/main.cpp.o
+FAILED: [code=1] CMakeFiles/convert_fgd_dem_cpp.dir/src/main.cpp.o 
+/usr/bin/c++  -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/include -I/Library/Frameworks/GDAL.framework/Headers -I/opt/homebrew/Cellar/libzip/1.11.4/include -I/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/build/_deps/cxxopts-src/include -F/Library/Frameworks -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -arch arm64 -Wall -Wextra -Wpedantic -Wno-unused-parameter -O3 -mcpu=apple-m1 -DNDEBUG -flto -ffast-math -funroll-loops -ftree-vectorize -fomit-frame-pointer -MD -MT CMakeFiles/convert_fgd_dem_cpp.dir/src/main.cpp.o -MF CMakeFiles/convert_fgd_dem_cpp.dir/src/main.cpp.o.d -o CMakeFiles/convert_fgd_dem_cpp.dir/src/main.cpp.o -c /Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:125:39: error: no member named 'par' in namespace 'std::execution'
+  125 |         std::for_each(std::execution::par, nested_zips.begin(), nested_zips.end(),
+      |                       ~~~~~~~~~~~~~~~~^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:128:27: error: reference to local variable 'output_tif' declared in enclosing lambda expression
+  128 |                           output_tif.replace_extension(".tif");
+      |                           ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:126:53: note: while substituting into a lambda expression here
+  126 |                       [&](const fs::path &zip_path) {
+      |                                                     ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:127:36: note: 'output_tif' declared here
+  127 |                           fs::path output_tif = output_folder / zip_path.stem();
+      |                                    ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:133:31: error: reference to local variable 'ss' declared in enclosing lambda expression
+  133 |                               ss << "Converting " << zip_path.filename().string() << " -> "
+      |                               ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:132:49: note: 'ss' declared here
+  132 |                               std::stringstream ss;
+      |                                                 ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:134:37: error: reference to local variable 'output_tif' declared in enclosing lambda expression
+  134 |                                  << output_tif.filename().string();
+      |                                     ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:127:36: note: 'output_tif' declared here
+  127 |                           fs::path output_tif = output_folder / zip_path.stem();
+      |                                    ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:135:44: error: reference to local variable 'ss' declared in enclosing lambda expression
+  135 |                               std::cout << ss.str() << "\n";
+      |                                            ^
+/Users/takamihidekazu/300-mygit/convert-fgd-dem-cpp/src/main.cpp:132:49: note: 'ss' declared here
+  132 |                               std::stringstream ss;
+      |                                                 ^
+5 errors generated.
+ninja: build stopped: subcommand failed.

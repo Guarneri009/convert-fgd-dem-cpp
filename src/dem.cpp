@@ -1,7 +1,9 @@
 #include "dem.hpp"
 
 #include <algorithm>
+#ifndef __APPLE__
 #include <execution>
+#endif
 #include <iostream>
 #include <mutex>
 #include <numeric>
@@ -174,9 +176,17 @@ void Dem::populate_metadata_list() {
     std::vector<size_t> indices(size);
     std::iota(indices.begin(), indices.end(), 0);
 
+#ifdef __APPLE__
+    // macOS doesn't support std::execution::par, use sequential
+    std::for_each(indices.begin(), indices.end(), [this](size_t i) {
+        meta_data_list[i] = format_metadata(all_content_list[i], mesh_code_list[i]);
+    });
+#else
+    // Use parallel execution on Linux
     std::for_each(std::execution::par, indices.begin(), indices.end(), [this](size_t i) {
         meta_data_list[i] = format_metadata(all_content_list[i], mesh_code_list[i]);
     });
+#endif
 }
 
 void Dem::store_bounds_latlng() {
@@ -245,8 +255,15 @@ void Dem::store_np_array_list() {
     std::vector<size_t> indices(all_content_list.size());
     std::iota(indices.begin(), indices.end(), 0);
 
+#ifdef __APPLE__
+    // macOS doesn't support std::execution::par, use sequential
+    std::for_each(indices.begin(), indices.end(),
+                  [this](size_t i) { np_array_list[i] = get_np_array(all_content_list[i]); });
+#else
+    // Use parallel execution on Linux
     std::for_each(std::execution::par, indices.begin(), indices.end(),
                   [this](size_t i) { np_array_list[i] = get_np_array(all_content_list[i]); });
+#endif
 }
 
 }  // namespace fgd_converter

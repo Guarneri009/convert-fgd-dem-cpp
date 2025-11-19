@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <charconv>
 #include <concepts>
+#include <cstdlib>
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <system_error>
 #include <vector>
@@ -120,11 +122,22 @@ class FastTupleListParser {
                 ++value_end;
             }
 
-            // Parse the value using std::from_chars (fastest method)
+            // Parse the value
             double value;
+#if defined(__APPLE__) || !defined(__cpp_lib_to_chars) || __cpp_lib_to_chars < 201611L
+            // macOS/AppleClang doesn't support std::from_chars for floating-point
+            // Use strtod as fallback
+            std::string temp_str(value_start, value_end - value_start);
+            char* end_ptr;
+            value = std::strtod(temp_str.c_str(), &end_ptr);
+            bool parse_ok = (end_ptr != temp_str.c_str());
+#else
+            // Use std::from_chars on platforms that support it (Linux/GCC)
             auto [p, ec] = std::from_chars(value_start, value_end, value);
+            bool parse_ok = (ec == std::errc{});
+#endif
 
-            if (ec == std::errc{}) {
+            if (parse_ok) {
                 // Handle sea points if needed
                 if (sea_at_zero && value <= -9999.0 && is_sea_type(type)) {
                     elevation_list.push_back(0.0);
