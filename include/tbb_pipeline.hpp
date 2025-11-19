@@ -131,7 +131,9 @@ class TBBPipeline {
 
 #else
 
-// Fallback when TBB is not available - use simple parallel processing
+// Fallback when TBB pipeline is not available - use simple TBB parallel processing
+#include <tbb/parallel_for.h>
+
 template <typename ResultType>
 class TBBPipeline {
    public:
@@ -143,19 +145,24 @@ class TBBPipeline {
     std::vector<ResultType> process_files(const std::vector<std::filesystem::path>& file_paths) {
         std::vector<ResultType> results(file_paths.size());
 
-// Simple parallel processing without pipeline
-#    pragma omp parallel for if (file_paths.size() > 1)
-        for (size_t i = 0; i < file_paths.size(); ++i) {
-            MemoryMappedFile mmap(file_paths[i]);
-            if (mmap.is_open()) {
-                results[i] = process_func_(mmap.view());
-            }
-        }
+        // Use TBB parallel_for for simple parallel processing
+        tbb::parallel_for(tbb::blocked_range<size_t>(0, file_paths.size()),
+            [&](const tbb::blocked_range<size_t>& range) {
+                for (size_t i = range.begin(); i != range.end(); ++i) {
+                    MemoryMappedFile mmap(file_paths[i]);
+                    if (mmap.is_open()) {
+                        results[i] = process_func_(mmap.view());
+                    }
+                }
+            });
 
         return results;
     }
 
-    static void set_max_threads(size_t) {}
+    static void set_max_threads(size_t num_threads) {
+        static tbb::global_control global_limit(tbb::global_control::max_allowed_parallelism,
+                                                num_threads);
+    }
 
    private:
     ProcessFunc process_func_;
