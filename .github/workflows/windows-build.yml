@@ -42,32 +42,143 @@ jobs:
         cd build
         ctest --output-on-failure
 
-    - name: Package artifacts
+    - name: Package artifacts with all dependencies
       shell: msys2 {0}
       run: |
         mkdir -p artifacts
         cp build/convert_fgd_dem_cpp.exe artifacts/
 
-        # Copy required DLLs
-        ldd build/convert_fgd_dem_cpp.exe | grep -i mingw | awk '{print $3}' | xargs -I {} cp {} artifacts/ || true
+        # Collect all required DLLs recursively
+        echo "Collecting DLL dependencies..."
 
-        # Create a simple README
+        # Create a script to recursively copy DLLs
+        cat > copy_dlls.sh << 'SCRIPT'
+        #!/bin/bash
+        set -e
+
+        TARGET_DIR="artifacts"
+        EXE_FILE="build/convert_fgd_dem_cpp.exe"
+        PROCESSED_DLLS="processed_dlls.txt"
+
+        > "$PROCESSED_DLLS"
+
+        function copy_dll_deps() {
+            local file="$1"
+
+            # Get all DLL dependencies
+            ldd "$file" 2>/dev/null | grep -i "mingw\|msys" | awk '{print $3}' | while read dll; do
+                if [ -f "$dll" ]; then
+                    local basename=$(basename "$dll")
+
+                    # Skip if already processed
+                    if grep -q "^$basename$" "$PROCESSED_DLLS" 2>/dev/null; then
+                        continue
+                    fi
+
+                    # Mark as processed
+                    echo "$basename" >> "$PROCESSED_DLLS"
+
+                    # Copy DLL
+                    echo "  Copying: $basename"
+                    cp "$dll" "$TARGET_DIR/"
+
+                    # Recursively process this DLL's dependencies
+                    copy_dll_deps "$dll"
+                fi
+            done
+        }
+
+        # Start with the main executable
+        echo "Processing dependencies for convert_fgd_dem_cpp.exe..."
+        copy_dll_deps "$EXE_FILE"
+
+        # Also copy GDAL data files (important for GDAL to work correctly)
+        if [ -d "/mingw64/share/gdal" ]; then
+            echo "Copying GDAL data files..."
+            mkdir -p "$TARGET_DIR/gdal-data"
+            cp -r /mingw64/share/gdal/* "$TARGET_DIR/gdal-data/"
+        fi
+
+        # Copy PROJ data files (needed for coordinate transformations)
+        if [ -d "/mingw64/share/proj" ]; then
+            echo "Copying PROJ data files..."
+            mkdir -p "$TARGET_DIR/proj-data"
+            cp -r /mingw64/share/proj/* "$TARGET_DIR/proj-data/"
+        fi
+
+        echo "DLL collection complete!"
+        echo "Total DLLs copied: $(cat $PROCESSED_DLLS | wc -l)"
+        SCRIPT
+
+        chmod +x copy_dlls.sh
+        ./copy_dlls.sh
+
+        # Create a launcher script to set environment variables
+        cat > artifacts/convert_fgd_dem_cpp.bat << 'BAT'
+        @echo off
+        setlocal
+
+        REM Set GDAL and PROJ data paths
+        set GDAL_DATA=%~dp0gdal-data
+        set PROJ_LIB=%~dp0proj-data
+
+        REM Run the executable with all arguments
+        "%~dp0convert_fgd_dem_cpp.exe" %*
+
+        endlocal
+        BAT
+
+        # Create a comprehensive README
         cat > artifacts/README.txt << 'EOF'
-        convert_fgd_dem_cpp - Windows Build
-        ====================================
+        convert_fgd_dem_cpp - Windows Standalone Build
+        ==============================================
 
-        This is a Windows build of convert_fgd_dem_cpp.
+        This package contains a fully standalone build of convert_fgd_dem_cpp
+        for Windows. All required DLLs and data files are included.
+
+        NO INSTALLATION REQUIRED - Just extract and run!
 
         Usage:
-          convert_fgd_dem_cpp.exe [options]
+        ------
+        1. Extract this ZIP file to any folder
+        2. Run convert_fgd_dem_cpp.bat (recommended) or convert_fgd_dem_cpp.exe
 
-        For more information, run:
-          convert_fgd_dem_cpp.exe --help
+        Using the .bat launcher (recommended):
+          convert_fgd_dem_cpp.bat [options] <input> <output>
+
+        Using the .exe directly:
+          set GDAL_DATA=%CD%\gdal-data
+          set PROJ_LIB=%CD%\proj-data
+          convert_fgd_dem_cpp.exe [options] <input> <output>
+
+        For help:
+          convert_fgd_dem_cpp.bat --help
+
+        Package Contents:
+        -----------------
+        - convert_fgd_dem_cpp.exe : Main executable
+        - convert_fgd_dem_cpp.bat : Launcher script (sets environment)
+        - *.dll                   : All required libraries (GDAL, libzip, TBB, etc.)
+        - gdal-data/              : GDAL data files
+        - proj-data/              : PROJ coordinate system data
 
         Build Information:
-          - Built with MinGW-w64 GCC
-          - Dependencies: GDAL, libzip, TBB
+        ------------------
+        - Built with MinGW-w64 GCC
+        - C++20 Standard
+        - Optimized Release Build
+        - Dependencies included: GDAL, libzip, TBB, PROJ
+
+        Note: This is a portable build. You can copy this entire folder
+              to any Windows PC and it will work without installation.
         EOF
+
+        # List all collected files for verification
+        echo ""
+        echo "Package contents:"
+        ls -lh artifacts/
+        echo ""
+        echo "DLL count: $(find artifacts/ -name "*.dll" | wc -l)"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
