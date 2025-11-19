@@ -19,17 +19,32 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Find required packages
 find_package(Threads REQUIRED)
-find_package(PkgConfig REQUIRED)
 
-# Find GDAL using pkg-config (more reliable on macOS with Homebrew)
-pkg_check_modules(GDAL REQUIRED gdal)
+# Try vcpkg first (for Windows), fall back to pkg-config (for Unix)
+if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
+    # Using vcpkg - use find_package
+    message(STATUS "Using vcpkg for dependency management")
+    find_package(GDAL CONFIG REQUIRED)
+    find_package(libzip CONFIG REQUIRED)
+    set(GDAL_LIBRARIES GDAL::GDAL)
+    set(LIBZIP_LIBRARIES libzip::zip)
+    set(GDAL_INCLUDE_DIRS "")
+    set(LIBZIP_INCLUDE_DIRS "")
+else()
+    # Using pkg-config (macOS/Linux)
+    message(STATUS "Using pkg-config for dependency management")
+    find_package(PkgConfig REQUIRED)
 
-# Store as standard GDAL variables for compatibility
-set(GDAL_LIBRARIES ${GDAL_LIBRARIES})
-set(GDAL_INCLUDE_DIRS ${GDAL_INCLUDE_DIRS})
+    # Find GDAL using pkg-config (more reliable on macOS with Homebrew)
+    pkg_check_modules(GDAL REQUIRED gdal)
 
-# Find libzip using pkg-config
-pkg_check_modules(LIBZIP REQUIRED libzip)
+    # Store as standard GDAL variables for compatibility
+    set(GDAL_LIBRARIES ${GDAL_LIBRARIES})
+    set(GDAL_INCLUDE_DIRS ${GDAL_INCLUDE_DIRS})
+
+    # Find libzip using pkg-config
+    pkg_check_modules(LIBZIP REQUIRED libzip)
+endif()
 
 # Find or fetch dependencies
 include(FetchContent)
@@ -63,31 +78,54 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
 )
 
-# Link libraries with proper library directories
-target_link_directories(${PROJECT_NAME} PRIVATE
-    ${GDAL_LIBRARY_DIRS}
-    ${LIBZIP_LIBRARY_DIRS}
-)
+# Link libraries
+if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
+    # vcpkg provides proper targets
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${GDAL_LIBRARIES}
+        ${LIBZIP_LIBRARIES}
+        cxxopts::cxxopts
+        Threads::Threads
+    )
+else()
+    # pkg-config requires link directories
+    target_link_directories(${PROJECT_NAME} PRIVATE
+        ${GDAL_LIBRARY_DIRS}
+        ${LIBZIP_LIBRARY_DIRS}
+    )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${GDAL_LIBRARIES}
-    ${LIBZIP_LIBRARIES}
-    cxxopts::cxxopts
-    Threads::Threads
-)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${GDAL_LIBRARIES}
+        ${LIBZIP_LIBRARIES}
+        cxxopts::cxxopts
+        Threads::Threads
+    )
+endif()
 
 # Compiler flags
-target_compile_options(${PROJECT_NAME} PRIVATE
-    ${LIBZIP_CFLAGS_OTHER}
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-unused-parameter
-    $<$<CONFIG:Debug>:-g -O0>
-)
+if(MSVC)
+    # MSVC compiler flags
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        /W4
+        /permissive-
+        /Zc:__cplusplus
+        $<$<CONFIG:Debug>:/Od /Zi>
+        $<$<CONFIG:Release>:/O2 /Ob2 /DNDEBUG>
+    )
+else()
+    # GCC/Clang compiler flags
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        ${LIBZIP_CFLAGS_OTHER}
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wno-unused-parameter
+        $<$<CONFIG:Debug>:-g -O0>
+    )
+endif()
 
-# Platform-specific Release optimizations
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+# Platform-specific Release optimizations (GCC/Clang only)
+if(NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Release")
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
         # x86_64 specific optimizations with AVX2
         target_compile_options(${PROJECT_NAME} PRIVATE
@@ -109,8 +147,8 @@ endif()
 # Enable Link-Time Optimization (LTO)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 
-# Parallel LTO compilation (suppress serial compilation warning)
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+# Parallel LTO compilation (suppress serial compilation warning) - GCC only
+if(NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Release")
     include(ProcessorCount)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
