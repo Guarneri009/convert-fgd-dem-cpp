@@ -106,6 +106,7 @@ endif()
 if(MSVC)
     # MSVC compiler flags
     target_compile_options(${PROJECT_NAME} PRIVATE
+        /std:c++20
         /W4
         /permissive-
         /Zc:__cplusplus
@@ -175,8 +176,13 @@ endif()
 # Check for specific GCC 11 features and disable if not available
 include(CheckCXXCompilerFlag)
 
-# Check for std::span support
-check_cxx_compiler_flag("-std=c++20" HAS_CXX20)
+# Check for C++20 support
+if(MSVC)
+    check_cxx_compiler_flag("/std:c++20" HAS_CXX20)
+else()
+    check_cxx_compiler_flag("-std=c++20" HAS_CXX20)
+endif()
+
 if(NOT HAS_CXX20)
     message(FATAL_ERROR "C++20 support is required")
 endif()
