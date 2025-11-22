@@ -113,6 +113,8 @@ if(MSVC)
         $<$<CONFIG:Debug>:/Od /Zi>
         $<$<CONFIG:Release>:/O2 /Ob2 /DNDEBUG>
     )
+    # Disable Windows min/max macros to avoid conflicts with std::min/std::max
+    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX)
 else()
     # GCC/Clang compiler flags
     target_compile_options(${PROJECT_NAME} PRIVATE
