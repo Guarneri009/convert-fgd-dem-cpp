@@ -71,13 +71,10 @@ set(SOURCES
 # Create executable with static linking
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Enable static linking for standalone executable
+# Enable static linking for standalone executable (Windows only)
 if(MSVC)
-    # MSVC static runtime
+    # MSVC static runtime for complete standalone executable
     set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-else()
-    # GCC/Clang static linking
-    target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
 endif()
 
 # Include directories
@@ -113,9 +110,7 @@ if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
         )
     endif()
 else()
-    # pkg-config: prefer static libraries
-    set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-
+    # pkg-config: Use dynamic libraries (default for Linux/macOS)
     target_link_directories(${PROJECT_NAME} PRIVATE
         ${GDAL_LIBRARY_DIRS}
         ${LIBZIP_LIBRARY_DIRS}
@@ -127,22 +122,6 @@ else()
         cxxopts::cxxopts
         Threads::Threads
     )
-
-    # Complete static linking on Unix-like systems
-    if(UNIX AND NOT APPLE)
-        # Try full static linking (requires static versions of all libraries)
-        target_link_options(${PROJECT_NAME} PRIVATE
-            -static
-            -static-libgcc
-            -static-libstdc++
-        )
-
-        # Link additional system libraries statically
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-            -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
-            -ldl -lrt -lm
-        )
-    endif()
 endif()
 
 # Compiler flags
