@@ -2,6 +2,7 @@
 clean:
 	rm -rf build
 
+
 # Clean data and output
 data_delete:
 	rm -rf ./extracted/*
