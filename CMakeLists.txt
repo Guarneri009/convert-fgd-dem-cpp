@@ -72,9 +72,19 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Enable static linking for standalone executable (Windows only)
-if(MSVC)
-    # MSVC static runtime for complete standalone executable
-    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(WIN32)
+    if(MSVC)
+        # MSVC static runtime for complete standalone executable
+        set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        # MSYS2/MinGW: Static linking for C++ runtime
+        target_link_options(${PROJECT_NAME} PRIVATE
+            -static-libgcc
+            -static-libstdc++
+            -static
+            -lpthread
+        )
+    endif()
 endif()
 
 # Include directories
@@ -86,7 +96,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 # Link libraries with preference for static libraries
 if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
-    # vcpkg: Force static libraries only
+    # vcpkg: Force static libraries only (Windows with vcpkg)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -110,7 +120,17 @@ if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
         )
     endif()
 else()
-    # pkg-config: Use dynamic libraries (default for Linux/macOS)
+    # pkg-config or MSYS2 pacman
+    if(WIN32 AND NOT MSVC)
+        # MSYS2/MinGW: Force static libraries
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+
+        # Use pkg-config to find static libraries
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GDAL REQUIRED gdal)
+        pkg_check_modules(LIBZIP REQUIRED libzip)
+    endif()
+
     target_link_directories(${PROJECT_NAME} PRIVATE
         ${GDAL_LIBRARY_DIRS}
         ${LIBZIP_LIBRARY_DIRS}
@@ -122,6 +142,17 @@ else()
         cxxopts::cxxopts
         Threads::Threads
     )
+
+    # MSYS2/MinGW: Add additional static dependencies
+    if(WIN32 AND NOT MSVC)
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            -lz -lbz2 -llzma -lzstd
+            -lssl -lcrypto
+            -lsqlite3 -lexpat -lcurl
+            -lproj -lgeos -lgeos_c
+            -lws2_32 -lwsock32 -lcrypt32 -lsecur32
+        )
+    endif()
 endif()
 
 # Compiler flags
