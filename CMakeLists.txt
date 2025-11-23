@@ -68,8 +68,17 @@ set(SOURCES
     src/zip_handler.cpp
 )
 
-# Create executable
+# Create executable with static linking
 add_executable(${PROJECT_NAME} ${SOURCES})
+
+# Enable static linking for standalone executable
+if(MSVC)
+    # MSVC static runtime
+    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+else()
+    # GCC/Clang static linking
+    target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
+endif()
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -78,17 +87,35 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIBZIP_INCLUDE_DIRS}
 )
 
-# Link libraries
+# Link libraries with preference for static libraries
 if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
-    # vcpkg provides proper targets
+    # vcpkg: Force static libraries only
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${GDAL_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         cxxopts::cxxopts
         Threads::Threads
     )
+
+    # Windows: Complete static linking
+    if(MSVC)
+        # Static runtime and remove incremental linking
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            LINK_FLAGS "/INCREMENTAL:NO"
+        )
+
+        # Ensure all dependencies are statically linked
+        target_compile_definitions(${PROJECT_NAME} PRIVATE
+            CURL_STATICLIB
+            LIBXML_STATIC
+        )
+    endif()
 else()
-    # pkg-config requires link directories
+    # pkg-config: prefer static libraries
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
     target_link_directories(${PROJECT_NAME} PRIVATE
         ${GDAL_LIBRARY_DIRS}
         ${LIBZIP_LIBRARY_DIRS}
@@ -100,6 +127,22 @@ else()
         cxxopts::cxxopts
         Threads::Threads
     )
+
+    # Complete static linking on Unix-like systems
+    if(UNIX AND NOT APPLE)
+        # Try full static linking (requires static versions of all libraries)
+        target_link_options(${PROJECT_NAME} PRIVATE
+            -static
+            -static-libgcc
+            -static-libstdc++
+        )
+
+        # Link additional system libraries statically
+        target_link_libraries(${PROJECT_NAME} PRIVATE
+            -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
+            -ldl -lrt -lm
+        )
+    endif()
 endif()
 
 # Compiler flags
