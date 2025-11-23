@@ -33,6 +33,8 @@ jobs:
           mingw-w64-x86_64-gdal
           mingw-w64-x86_64-libzip
           mingw-w64-x86_64-tbb
+          mingw-w64-x86_64-proj
+          mingw-w64-x86_64-geos
 
     - name: Configure CMake
       run: |
