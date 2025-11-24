@@ -21,11 +21,11 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/vcpkg
-          ${{ github.workspace }}/build/vcpkg_installed
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          ${{ github.workspace }}/vcpkg/installed
+          ${{ github.workspace }}/vcpkg/downloads
+        key: vcpkg-osgeo4w-${{ runner.os }}-gdal-libzip-tbb-v2
         restore-keys: |
-          vcpkg-${{ runner.os }}-
+          vcpkg-osgeo4w-${{ runner.os }}-
 
     - name: Install vcpkg
       run: |
@@ -34,8 +34,22 @@ jobs:
 
     - name: Install dependencies via vcpkg
       run: |
-        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows
-        .\vcpkg\vcpkg install tbb:x64-windows-static
+        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows-static --triplet x64-windows
+      timeout-minutes: 60
+
+    - name: Verify vcpkg installation
+      run: |
+        Write-Host "=== Installed packages ==="
+        .\vcpkg\vcpkg list
+        Write-Host ""
+        Write-Host "=== GDAL installation check ==="
+        if (Test-Path ".\vcpkg\installed\x64-windows\share\gdal\GDALConfig.cmake") {
+          Write-Host "GDAL found!"
+        } else {
+          Write-Host "ERROR: GDAL not found!"
+          Get-ChildItem -Recurse .\vcpkg\installed\ -Name "*gdal*" -ErrorAction SilentlyContinue
+          exit 1
+        }
 
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
@@ -47,7 +61,7 @@ jobs:
         cmake -B build -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
-          -DVCPKG_INSTALLED_DIR="${{ github.workspace }}/vcpkg_installed" `
+          -DVCPKG_TARGET_TRIPLET="x64-windows" `
           -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
 
     - name: Build
