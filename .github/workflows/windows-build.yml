@@ -46,43 +46,53 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cmake -B build -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++" \
-          -DCMAKE_FIND_LIBRARY_SUFFIXES=".a"
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --verbose
 
-    - name: Verify static linking
+    - name: Check dependencies
       run: |
-        echo "=== Checking dependencies ==="
-        ldd build/convert_fgd_dem_cpp.exe || true
+        echo "=== Checking DLL dependencies ==="
+        ldd build/convert_fgd_dem_cpp.exe
         echo ""
         echo "=== File size ==="
         ls -lh build/convert_fgd_dem_cpp.exe
+
+    - name: Collect DLLs
+      run: |
+        echo "=== Collecting required DLLs ==="
+        mkdir -p artifacts
+        cp build/convert_fgd_dem_cpp.exe artifacts/
+
+        # Use ldd to find all DLL dependencies and copy them
+        # Filter out Windows system DLLs (only copy MinGW/MSYS2 DLLs)
+        ldd build/convert_fgd_dem_cpp.exe | grep -i mingw64 | awk '{print $3}' | while read dll; do
+          if [ -f "$dll" ]; then
+            echo "Copying: $dll"
+            cp "$dll" artifacts/
+          fi
+        done
+
         echo ""
-        echo "=== File info ==="
-        file build/convert_fgd_dem_cpp.exe
+        echo "=== Collected files ==="
+        ls -lh artifacts/
 
     - name: Test executable
       run: |
-        echo "=== Testing executable ==="
-        if [ -f build/convert_fgd_dem_cpp.exe ]; then
-          ./build/convert_fgd_dem_cpp.exe --help || echo "Help command executed"
+        echo "=== Testing executable with DLLs ==="
+        cd artifacts
+        if [ -f convert_fgd_dem_cpp.exe ]; then
+          ./convert_fgd_dem_cpp.exe --help || echo "Help command executed"
           echo "Executable runs successfully!"
         else
           echo "ERROR: Executable not found!"
           exit 1
         fi
 
-    - name: Prepare artifacts
+    - name: Add documentation to artifacts
       run: |
-        echo "=== Preparing artifacts ==="
-        mkdir -p artifacts
-        cp build/convert_fgd_dem_cpp.exe artifacts/
-
-        # Copy any additional files if needed
+        echo "=== Adding documentation ==="
         if [ -f README.md ]; then
           cp README.md artifacts/
         fi
@@ -90,13 +100,14 @@ jobs:
           cp LICENSE artifacts/
         fi
 
-        echo "=== Artifacts contents ==="
+        echo ""
+        echo "=== Final artifacts contents ==="
         ls -lh artifacts/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: convert-fgd-dem-cpp-windows-x64-static-msys2
+        name: convert-fgd-dem-cpp-windows-x64-msys2
         path: artifacts/
         retention-days: 30
 
@@ -105,13 +116,13 @@ jobs:
       shell: bash
       run: |
         cd artifacts
-        7z a ../convert-fgd-dem-cpp-windows-x64-static.zip *
+        7z a ../convert-fgd-dem-cpp-windows-x64.zip *
 
     - name: Upload Release Asset
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: convert-fgd-dem-cpp-windows-x64-static.zip
+        files: convert-fgd-dem-cpp-windows-x64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
