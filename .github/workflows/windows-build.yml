@@ -34,7 +34,8 @@ jobs:
 
     - name: Install dependencies via vcpkg
       run: |
-        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows-static
+        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows
+        .\vcpkg\vcpkg install tbb:x64-windows-static
 
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
@@ -46,7 +47,7 @@ jobs:
         cmake -B build -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
-          -DVCPKG_TARGET_TRIPLET=x64-windows `
+          -DVCPKG_INSTALLED_DIR="${{ github.workspace }}/vcpkg_installed" `
           -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
 
     - name: Build

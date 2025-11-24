@@ -203,14 +203,27 @@ if(NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 # Link TBB for parallel execution support
-find_package(TBB QUIET)
+find_package(TBB CONFIG QUIET)
 if(TBB_FOUND)
     target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
     message(STATUS "TBB Found: Parallel execution enabled")
+
+    # For MSVC with static TBB
+    if(MSVC)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE __TBB_NO_IMPLICIT_LINKAGE)
+    endif()
 else()
-    message(WARNING "TBB not found: Falling back to sequential execution")
-    # Fall back to standard library parallel execution
-    target_link_libraries(${PROJECT_NAME} PRIVATE tbb)
+    find_package(TBB QUIET)
+    if(TBB_FOUND)
+        target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
+        message(STATUS "TBB Found (pkg-config): Parallel execution enabled")
+    else()
+        message(WARNING "TBB not found: Falling back to sequential execution")
+        # Try to link with -ltbb as fallback
+        if(NOT WIN32 OR NOT MSVC)
+            target_link_libraries(${PROJECT_NAME} PRIVATE tbb)
+        endif()
+    endif()
 endif()
 
 # Check for specific GCC 11 features and disable if not available
