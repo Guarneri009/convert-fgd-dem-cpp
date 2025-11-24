@@ -9,120 +9,113 @@ env:
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
 jobs:
-  # MSYS2/MinGW build with complete static linking
-  build-msys2-static:
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        shell: msys2 {0}
+  # OSGeo4W compatible build with MSVC
+  build-osgeo4w:
+    runs-on: windows-2022
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2
+    - name: Setup vcpkg cache
+      uses: actions/cache@v4
       with:
-        msystem: MINGW64
-        update: true
-        install: >-
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-ninja
-          mingw-w64-x86_64-gdal
-          mingw-w64-x86_64-libzip
-          mingw-w64-x86_64-tbb
-          mingw-w64-x86_64-proj
-          mingw-w64-x86_64-geos
-          mingw-w64-x86_64-zlib
-          mingw-w64-x86_64-sqlite3
-          mingw-w64-x86_64-curl
-          mingw-w64-x86_64-expat
-          mingw-w64-x86_64-openssl
-          mingw-w64-x86_64-xz
-          mingw-w64-x86_64-zstd
-          mingw-w64-x86_64-bzip2
+        path: |
+          ${{ github.workspace }}/vcpkg
+          ${{ github.workspace }}/build/vcpkg_installed
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+
+    - name: Install dependencies via vcpkg
+      run: |
+        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows-static
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
 
     - name: Configure CMake
       run: |
-        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -G Ninja `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+          -DVCPKG_TARGET_TRIPLET=x64-windows `
+          -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
 
     - name: Build
-      run: cmake --build build --verbose
+      run: cmake --build build --config Release --verbose
 
     - name: Check dependencies
+      shell: pwsh
       run: |
-        echo "=== Checking DLL dependencies ==="
-        ldd build/convert_fgd_dem_cpp.exe
-        echo ""
-        echo "=== File size ==="
-        ls -lh build/convert_fgd_dem_cpp.exe
+        Write-Host "=== Checking DLL dependencies ==="
+        dumpbin /DEPENDENTS build\convert_fgd_dem_cpp.exe
+        Write-Host ""
+        Write-Host "=== File size ==="
+        Get-Item build\convert_fgd_dem_cpp.exe | Format-List Length
 
-    - name: Collect DLLs
+    - name: Prepare artifacts
+      shell: pwsh
       run: |
-        echo "=== Collecting required DLLs ==="
-        mkdir -p artifacts
-        cp build/convert_fgd_dem_cpp.exe artifacts/
+        Write-Host "=== Preparing artifacts ==="
+        New-Item -ItemType Directory -Force -Path artifacts
+        Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
-        # Use ldd to find all DLL dependencies and copy them
-        # Filter out Windows system DLLs (only copy MinGW/MSYS2 DLLs)
-        ldd build/convert_fgd_dem_cpp.exe | grep -i mingw64 | awk '{print $3}' | while read dll; do
-          if [ -f "$dll" ]; then
-            echo "Copying: $dll"
-            cp "$dll" artifacts/
-          fi
-        done
+        # Copy documentation
+        if (Test-Path README_WINDOWS.md) {
+          Copy-Item README_WINDOWS.md artifacts\
+        }
+        if (Test-Path README.md) {
+          Copy-Item README.md artifacts\
+        }
+        if (Test-Path LICENSE) {
+          Copy-Item LICENSE artifacts\
+        }
+        if (Test-Path convert_osgeo4w.bat) {
+          Copy-Item convert_osgeo4w.bat artifacts\convert.bat
+        }
 
-        echo ""
-        echo "=== Collected files ==="
-        ls -lh artifacts/
+        Write-Host ""
+        Write-Host "=== Final artifacts contents ==="
+        Get-ChildItem artifacts | Format-Table Name, Length
 
     - name: Test executable
+      shell: cmd
       run: |
-        echo "=== Testing executable with DLLs ==="
-        cd artifacts
-        if [ -f convert_fgd_dem_cpp.exe ]; then
-          ./convert_fgd_dem_cpp.exe --help || echo "Help command executed"
-          echo "Executable runs successfully!"
-        else
-          echo "ERROR: Executable not found!"
-          exit 1
-        fi
-
-    - name: Add documentation to artifacts
-      run: |
-        echo "=== Adding documentation ==="
-        if [ -f README.md ]; then
-          cp README.md artifacts/
-        fi
-        if [ -f LICENSE ]; then
-          cp LICENSE artifacts/
-        fi
-
-        echo ""
-        echo "=== Final artifacts contents ==="
-        ls -lh artifacts/
+        echo === Testing executable ===
+        artifacts\convert_fgd_dem_cpp.exe --help || echo Help command executed
+        if %ERRORLEVEL% EQU 0 (
+          echo Executable runs successfully!
+        ) else (
+          echo ERROR: Executable failed!
+          exit /b 1
+        )
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: convert-fgd-dem-cpp-windows-x64-msys2
+        name: convert-fgd-dem-cpp-windows-x64-osgeo4w
         path: artifacts/
         retention-days: 30
 
     - name: Create Release Archive
       if: startsWith(github.ref, 'refs/tags/')
-      shell: bash
+      shell: pwsh
       run: |
-        cd artifacts
-        7z a ../convert-fgd-dem-cpp-windows-x64.zip *
+        Compress-Archive -Path artifacts\* -DestinationPath convert-fgd-dem-cpp-windows-x64-osgeo4w.zip
 
     - name: Upload Release Asset
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: convert-fgd-dem-cpp-windows-x64.zip
+        files: convert-fgd-dem-cpp-windows-x64-osgeo4w.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
