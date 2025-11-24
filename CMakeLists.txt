@@ -77,13 +77,16 @@ if(WIN32)
         # MSVC static runtime for complete standalone executable
         set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     else()
-        # MSYS2/MinGW: Static linking for C++ runtime
+        # MSYS2/MinGW: Complete static linking
         target_link_options(${PROJECT_NAME} PRIVATE
+            -static
             -static-libgcc
             -static-libstdc++
-            -static
             -lpthread
+            -Wl,--allow-multiple-definition
         )
+        # Force static library search
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
     endif()
 endif()
 
@@ -143,14 +146,26 @@ else()
         Threads::Threads
     )
 
-    # MSYS2/MinGW: Add additional static dependencies
+    # MSYS2/MinGW: Add all static dependencies for complete standalone build
     if(WIN32 AND NOT MSVC)
         target_link_libraries(${PROJECT_NAME} PRIVATE
+            # Compression libraries
             -lz -lbz2 -llzma -lzstd
+
+            # SSL/Crypto
             -lssl -lcrypto
-            -lsqlite3 -lexpat -lcurl
-            -lproj -lgeos -lgeos_c
-            -lws2_32 -lwsock32 -lcrypt32 -lsecur32
+
+            # Database and XML
+            -lsqlite3 -lexpat
+
+            # Network
+            -lcurl -lnghttp2 -lidn2 -lunistring -lpsl -lssh2 -lbrotlidec -lbrotlicommon
+
+            # Geospatial
+            -lproj -lgeos -lgeos_c -ltiff -ljpeg -lpng -lwebp -lgeotiff -lhdf5 -lnetcdf
+
+            # Windows system libraries (must be last)
+            -lws2_32 -lwsock32 -lcrypt32 -lsecur32 -lbcrypt -lwinmm -lgdi32 -lole32 -luuid
         )
     endif()
 endif()
