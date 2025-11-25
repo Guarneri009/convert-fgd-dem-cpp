@@ -41,7 +41,7 @@ jobs:
 
     - name: Install dependencies via vcpkg
       run: |
-        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows-static --triplet x64-windows
+        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
       timeout-minutes: 120
 
     - name: Verify vcpkg installation
@@ -89,6 +89,11 @@ jobs:
         Write-Host "=== Preparing artifacts ==="
         New-Item -ItemType Directory -Force -Path artifacts
         Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
+
+        # Copy TBB DLLs (required for parallel processing)
+        Write-Host "=== Copying TBB DLLs ==="
+        Copy-Item vcpkg\installed\x64-windows\bin\tbb*.dll artifacts\
+        Get-ChildItem artifacts\tbb*.dll | Format-Table Name, Length
 
         # Copy documentation
         if (Test-Path README_WINDOWS.md) {
