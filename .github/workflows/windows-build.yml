@@ -17,6 +17,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Export GitHub Actions cache environment variables
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
     - name: Setup vcpkg cache
       uses: actions/cache@v4
       with:
@@ -35,7 +42,7 @@ jobs:
     - name: Install dependencies via vcpkg
       run: |
         .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows-static --triplet x64-windows
-      timeout-minutes: 60
+      timeout-minutes: 120
 
     - name: Verify vcpkg installation
       run: |
