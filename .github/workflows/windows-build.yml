@@ -112,10 +112,11 @@ jobs:
         New-Item -ItemType Directory -Force -Path artifacts
         Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
-        # Copy TBB DLLs (required for parallel processing)
-        Write-Host "=== Copying TBB DLLs ==="
-        Copy-Item vcpkg\installed\x64-windows\bin\tbb*.dll artifacts\
-        Get-ChildItem artifacts\tbb*.dll | Format-Table Name, Length
+        # Copy all required DLLs (GDAL, libzip, TBB, and their dependencies)
+        Write-Host "=== Copying DLLs ==="
+        Copy-Item vcpkg\installed\x64-windows\bin\*.dll artifacts\
+        Write-Host "Copied DLLs:"
+        Get-ChildItem artifacts\*.dll | Format-Table Name, Length
 
         # Copy documentation
         if (Test-Path README_WINDOWS.md) {
@@ -132,8 +133,11 @@ jobs:
         }
 
         Write-Host ""
-        Write-Host "=== Final artifacts contents ==="
-        Get-ChildItem artifacts | Format-Table Name, Length
+        Write-Host "=== Final artifacts summary ==="
+        Write-Host "EXE files:"
+        Get-ChildItem artifacts\*.exe | Format-Table Name, Length
+        Write-Host "DLL files: $(( Get-ChildItem artifacts\*.dll ).Count) files"
+        Write-Host "Total size: $([math]::Round((Get-ChildItem artifacts -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB, 2)) MB"
 
     - name: 🧪 Test executable
       shell: cmd
