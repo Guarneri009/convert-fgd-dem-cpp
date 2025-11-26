@@ -5,46 +5,70 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
 jobs:
-  # OSGeo4W compatible build with MSVC
   build-osgeo4w:
+    name: build (windows-x64)
     runs-on: windows-2022
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: 🐣 Checkout code
+      uses: actions/checkout@v5
 
-    - name: Export GitHub Actions cache environment variables
+    - name: 📦 Export GitHub Actions cache environment variables
       uses: actions/github-script@v7
       with:
         script: |
           core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
-    - name: Setup vcpkg cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ${{ github.workspace }}/vcpkg/installed
-          ${{ github.workspace }}/vcpkg/downloads
-        key: vcpkg-osgeo4w-${{ runner.os }}-gdal-libzip-tbb-v2
-        restore-keys: |
-          vcpkg-osgeo4w-${{ runner.os }}-
+    - name: 🔨 Uninstall system cmake
+      shell: bash
+      run: |
+        choco uninstall cmake.install -y
 
-    - name: Install vcpkg
+    - name: 🐩 Install CMake and Ninja
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: 3.31.6
+
+    - name: 🧽 Developer Command Prompt for Microsoft Visual C++
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: 🎡 Setup vcpkg
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Install dependencies via vcpkg
+    - name: 🛍️ Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        max-size: 500M
+        key: build-ccache-win64-${{ github.event.pull_request.base.ref || github.ref_name }}
+        save: ${{ github.event_name == 'push' }}
+
+    - name: 🛍️ Tune ccache configuration
+      shell: bash
       run: |
-        .\vcpkg\vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
+        ccache --set-config sloppiness=pch_defines,time_macros,include_file_mtime,include_file_ctime
+
+    - name: 🌱 Install dependencies via vcpkg
+      shell: bash
+      env:
+        X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
+      run: |
+        ./vcpkg/vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
       timeout-minutes: 120
 
-    - name: Verify vcpkg installation
+    - name: ✅ Verify vcpkg installation
       run: |
         Write-Host "=== Installed packages ==="
         .\vcpkg\vcpkg list
@@ -58,23 +82,21 @@ jobs:
           exit 1
         }
 
-    - name: Setup MSVC
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    - name: Configure CMake
+    - name: 🔧 Configure CMake
+      shell: bash
       run: |
-        cmake -B build -G Ninja `
-          -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
-          -DVCPKG_TARGET_TRIPLET="x64-windows" `
-          -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+          -DVCPKG_TARGET_TRIPLET="x64-windows" \
+          -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded" \
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-    - name: Build
+    - name: 🌋 Build
       run: cmake --build build --config Release --verbose
 
-    - name: Check dependencies
+    - name: 🔍 Check dependencies
       shell: pwsh
       run: |
         Write-Host "=== Checking DLL dependencies ==="
@@ -83,7 +105,7 @@ jobs:
         Write-Host "=== File size ==="
         Get-Item build\convert_fgd_dem_cpp.exe | Format-List Length
 
-    - name: Prepare artifacts
+    - name: 📦 Prepare artifacts
       shell: pwsh
       run: |
         Write-Host "=== Preparing artifacts ==="
@@ -113,7 +135,7 @@ jobs:
         Write-Host "=== Final artifacts contents ==="
         Get-ChildItem artifacts | Format-Table Name, Length
 
-    - name: Test executable
+    - name: 🧪 Test executable
       shell: cmd
       run: |
         echo === Testing executable ===
@@ -125,24 +147,33 @@ jobs:
           exit /b 1
         )
 
-    - name: Upload artifacts
+    - name: 📑 Upload build logs
       uses: actions/upload-artifact@v4
+      if: failure()
       with:
-        name: convert-fgd-dem-cpp-windows-x64-osgeo4w
+        name: build-logs-x64-windows
+        path: |
+          build/**/*.log
+          vcpkg/buildtrees/**/*.log
+
+    - name: 📤 Upload artifacts
+      uses: actions/upload-artifact@v4
+      id: artifact-win64
+      with:
+        name: convert-fgd-dem-cpp-windows-x64
         path: artifacts/
         retention-days: 30
 
-    - name: Create Release Archive
+    - name: 📝 Create Release Archive
       if: startsWith(github.ref, 'refs/tags/')
       shell: pwsh
       run: |
-        Compress-Archive -Path artifacts\* -DestinationPath convert-fgd-dem-cpp-windows-x64-osgeo4w.zip
+        Compress-Archive -Path artifacts\* -DestinationPath convert-fgd-dem-cpp-windows-x64.zip
 
-    - name: Upload Release Asset
+    - name: 🚀 Upload Release Asset
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: convert-fgd-dem-cpp-windows-x64-osgeo4w.zip
+        files: convert-fgd-dem-cpp-windows-x64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
