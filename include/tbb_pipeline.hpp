@@ -33,7 +33,7 @@ class TBBPipeline {
      */
     explicit TBBPipeline(ProcessFunc process_func, size_t max_tokens = 0)
         : process_func_(std::move(process_func)),
-          max_tokens_(max_tokens == 0 ? std::thread::hardware_concurrency() * 2 : max_tokens) {}
+          max_tokens_(max_tokens == 0 ? std::thread::hardware_concurrency() * 3 : max_tokens) {}
 
     /**
      * @brief Process files through TBB pipeline

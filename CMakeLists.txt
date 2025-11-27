@@ -20,18 +20,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Find required packages
 find_package(Threads REQUIRED)
 
-# Try vcpkg first (for Windows), fall back to pkg-config (for Unix)
-if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
-    # Using vcpkg - use find_package
-    message(STATUS "Using vcpkg for dependency management")
+# Dependency management strategy:
+# - Windows: Use vcpkg (if VCPKG_TARGET_TRIPLET is set)
+# - macOS/Linux: Use pkg-config (preferred, ignore VCPKG_ROOT)
+if(WIN32 AND DEFINED VCPKG_TARGET_TRIPLET)
+    # Windows with vcpkg - use find_package
+    message(STATUS "Using vcpkg for dependency management (Windows)")
     find_package(GDAL CONFIG REQUIRED)
     find_package(libzip CONFIG REQUIRED)
     set(GDAL_LIBRARIES GDAL::GDAL)
     set(LIBZIP_LIBRARIES libzip::zip)
     set(GDAL_INCLUDE_DIRS "")
     set(LIBZIP_INCLUDE_DIRS "")
+    set(USE_VCPKG TRUE)
 else()
-    # Using pkg-config (macOS/Linux)
+    # macOS/Linux: Use pkg-config (preferred)
     message(STATUS "Using pkg-config for dependency management")
     find_package(PkgConfig REQUIRED)
 
@@ -44,6 +47,7 @@ else()
 
     # Find libzip using pkg-config
     pkg_check_modules(LIBZIP REQUIRED libzip)
+    set(USE_VCPKG FALSE)
 endif()
 
 # Find or fetch dependencies
@@ -91,7 +95,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 # Link libraries with preference for static libraries
-if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
+if(USE_VCPKG)
     # vcpkg: Force static libraries only (Windows with vcpkg)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
 
@@ -116,7 +120,7 @@ if(DEFINED VCPKG_TARGET_TRIPLET OR DEFINED ENV{VCPKG_ROOT})
         )
     endif()
 else()
-    # pkg-config or MSYS2 pacman
+    # pkg-config (macOS/Linux) or MSYS2 pacman
     if(WIN32 AND NOT MSVC)
         # MSYS2/MinGW: Force static libraries
         set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
