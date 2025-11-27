@@ -58,7 +58,8 @@ void Dem::get_xml_content() {
 
 void Dem::unzip_dem() {
     // Create unique extraction folder based on the zip filename
-    std::filesystem::path extract_to = "./extracted" / import_path.stem();
+    std::filesystem::path extract_to = std::filesystem::path("extracted") / import_path.stem();
+    extract_to = std::filesystem::absolute(extract_to).make_preferred();
     std::filesystem::create_directories(extract_to);
 
     if (zip::is_zip_file(import_path)) {
@@ -90,7 +91,8 @@ void Dem::unzip_dem() {
 auto Dem::get_xml_paths() -> std::vector<std::filesystem::path> {
     std::vector<std::filesystem::path> xml_files;
     // Use the same unique extraction folder
-    std::filesystem::path extract_dir = "./extracted" / import_path.stem();
+    std::filesystem::path extract_dir = std::filesystem::path("extracted") / import_path.stem();
+    extract_dir = std::filesystem::absolute(extract_dir).make_preferred();
 
     if (!std::filesystem::exists(extract_dir)) {
         return xml_files;

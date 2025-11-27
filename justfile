@@ -38,7 +38,7 @@ rebuild:
 # Run the program
 run: data_delete
 	@echo "Running convert_fgd_dem_cpp..."
-	time ./build/convert_fgd_dem_cpp -i ./data_5m
+	time ./build/convert_fgd_dem_cpp -i ./.data_5m
 
 #time ./build/convert_fgd_dem_cpp -i ./data_5m --rgbify true
 

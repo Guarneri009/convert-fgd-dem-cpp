@@ -22,8 +22,12 @@ ZipHandler &ZipHandler::operator=(ZipHandler &&) noexcept = default;
 
 auto ZipHandler::extract(const std::filesystem::path &output_dir,
                          std::error_code &ec) -> std::optional<std::vector<std::filesystem::path>> {
+    // Convert to absolute path with native separators for cross-platform compatibility
+    auto abs_zip_path = std::filesystem::absolute(pImpl->zip_path_).make_preferred();
+    auto abs_output_dir = std::filesystem::absolute(output_dir).make_preferred();
+
     int err = 0;
-    zip_t *z = zip_open(pImpl->zip_path_.string().c_str(), 0, &err);
+    zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
@@ -32,14 +36,15 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
     std::vector<std::filesystem::path> extracted_files;
     zip_int64_t num_entries = zip_get_num_entries(z, 0);
 
-    std::filesystem::create_directories(output_dir);
+    std::filesystem::create_directories(abs_output_dir);
 
     for (zip_int64_t i = 0; i < num_entries; ++i) {
         const char *name = zip_get_name(z, i, 0);
         if (!name)
             continue;
 
-        std::filesystem::path output_path = output_dir / name;
+        std::filesystem::path output_path = abs_output_dir / name;
+        output_path = output_path.make_preferred();
 
         // Create parent directories if needed
         if (output_path.has_parent_path()) {
@@ -78,8 +83,12 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
 auto ZipHandler::extract_specific(
     const std::filesystem::path &output_dir, std::span<const std::string_view> file_patterns,
     std::error_code &ec) -> std::optional<std::vector<std::filesystem::path>> {
+    // Convert to absolute path with native separators for cross-platform compatibility
+    auto abs_zip_path = std::filesystem::absolute(pImpl->zip_path_).make_preferred();
+    auto abs_output_dir = std::filesystem::absolute(output_dir).make_preferred();
+
     int err = 0;
-    zip_t *z = zip_open(pImpl->zip_path_.string().c_str(), 0, &err);
+    zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
@@ -88,7 +97,7 @@ auto ZipHandler::extract_specific(
     std::vector<std::filesystem::path> extracted_files;
     zip_int64_t num_entries = zip_get_num_entries(z, 0);
 
-    std::filesystem::create_directories(output_dir);
+    std::filesystem::create_directories(abs_output_dir);
 
     for (zip_int64_t i = 0; i < num_entries; ++i) {
         const char *name = zip_get_name(z, i, 0);
@@ -107,7 +116,8 @@ auto ZipHandler::extract_specific(
         if (!should_extract)
             continue;
 
-        std::filesystem::path output_path = output_dir / name;
+        std::filesystem::path output_path = abs_output_dir / name;
+        output_path = output_path.make_preferred();
 
         if (output_path.has_parent_path()) {
             std::filesystem::create_directories(output_path.parent_path());
@@ -141,8 +151,10 @@ auto ZipHandler::extract_specific(
 }
 
 auto ZipHandler::list_files(std::error_code &ec) const -> std::optional<std::vector<std::string>> {
+    auto abs_zip_path = std::filesystem::absolute(pImpl->zip_path_).make_preferred();
+
     int err = 0;
-    zip_t *z = zip_open(pImpl->zip_path_.string().c_str(), 0, &err);
+    zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
@@ -164,8 +176,10 @@ auto ZipHandler::list_files(std::error_code &ec) const -> std::optional<std::vec
 
 auto ZipHandler::read_file(std::string_view filename,
                            std::error_code &ec) const -> std::optional<std::vector<uint8_t>> {
+    auto abs_zip_path = std::filesystem::absolute(pImpl->zip_path_).make_preferred();
+
     int err = 0;
-    zip_t *z = zip_open(pImpl->zip_path_.string().c_str(), 0, &err);
+    zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
