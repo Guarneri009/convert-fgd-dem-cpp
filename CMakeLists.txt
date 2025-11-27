@@ -58,9 +58,15 @@ FetchContent_Declare(
     cxxopts
     GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
     GIT_TAG v3.1.1
+    GIT_SHALLOW TRUE
 )
 
-FetchContent_MakeAvailable(cxxopts)
+# EXCLUDE_FROM_ALL を指定して不要なターゲットを除外
+FetchContent_GetProperties(cxxopts)
+if(NOT cxxopts_POPULATED)
+    FetchContent_Populate(cxxopts)
+    add_subdirectory(${cxxopts_SOURCE_DIR} ${cxxopts_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # Source files
 set(SOURCES
