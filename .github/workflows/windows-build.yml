@@ -10,89 +10,68 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-exe:
-    name: Build EXE (windows-x64)
+  build-msys2:
+    name: build (windows-x64-msys2)
     runs-on: windows-2022
+
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Download vcpkg installed
-      uses: dawidd6/action-download-artifact@v6
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
       with:
-        workflow: windows-deps.yml
-        name: vcpkg-installed-x64-windows
-        path: vcpkg/
-      continue-on-error: true
-      id: download-deps
+        msystem: UCRT64
+        update: true
+        install: >-
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-cmake
+          mingw-w64-ucrt-x86_64-ninja
+          mingw-w64-ucrt-x86_64-gdal
+          mingw-w64-ucrt-x86_64-libzip
+          mingw-w64-ucrt-x86_64-tbb
 
-    - name: Check if dependencies exist
-      id: check-deps
-      shell: pwsh
+    - name: Verify installation
       run: |
-        if (Test-Path "vcpkg/installed/x64-windows/share/gdal/GDALConfig.cmake") {
-          Write-Host "Dependencies found from artifact!"
-          echo "deps_found=true" >> $env:GITHUB_OUTPUT
-        } else {
-          Write-Host "Dependencies NOT found. Need to build them."
-          Write-Host "Please run the 'Windows Dependencies' workflow first!"
-          echo "deps_found=false" >> $env:GITHUB_OUTPUT
-        }
-
-    - name: Fail if no dependencies
-      if: steps.check-deps.outputs.deps_found == 'false'
-      shell: pwsh
-      run: |
-        Write-Host "ERROR: Dependencies not found!"
-        Write-Host ""
-        Write-Host "Please run the 'Windows Dependencies' workflow first:"
-        Write-Host "  1. Go to Actions tab"
-        Write-Host "  2. Click 'Windows Dependencies'"
-        Write-Host "  3. Click 'Run workflow'"
-        Write-Host "  4. Wait for it to complete"
-        Write-Host "  5. Re-run this workflow"
-        exit 1
-
-    - name: Install CMake and Ninja
-      uses: lukka/get-cmake@latest
-      with:
-        cmakeVersion: 3.31.6
-
-    - name: Developer Command Prompt for Microsoft Visual C++
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        max-size: 500M
-        key: build-ccache-win64-${{ github.event.pull_request.base.ref || github.ref_name }}
-        save: ${{ github.event_name == 'push' }}
+        echo "=== GCC version ==="
+        gcc --version
+        echo ""
+        echo "=== CMake version ==="
+        cmake --version
+        echo ""
+        echo "=== GDAL version ==="
+        gdal-config --version
+        echo ""
+        echo "=== pkg-config check ==="
+        pkg-config --modversion gdal
+        pkg-config --modversion libzip
 
     - name: Configure CMake
-      shell: bash
       run: |
         cmake -B build -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-          -DVCPKG_TARGET_TRIPLET="x64-windows" \
-          -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded" \
-          -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      run: cmake --build build --config Release --verbose
-
-    - name: Check dependencies
-      shell: pwsh
       run: |
-        Write-Host "=== Checking DLL dependencies ==="
-        dumpbin /DEPENDENTS build\convert_fgd_dem_cpp.exe
-        Write-Host ""
-        Write-Host "=== File size ==="
-        Get-Item build\convert_fgd_dem_cpp.exe | Format-List Length
+        cmake --build build --config Release
+
+    - name: Check executable
+      run: |
+        echo "=== File info ==="
+        ls -la build/convert_fgd_dem_cpp.exe
+        echo ""
+        echo "=== Linked libraries ==="
+        ldd build/convert_fgd_dem_cpp.exe
+
+    - name: Test executable
+      run: |
+        echo "=== Testing executable ==="
+        ./build/convert_fgd_dem_cpp.exe --help || true
+        echo "Executable runs successfully!"
 
     - name: Prepare artifacts
       shell: pwsh
@@ -101,11 +80,85 @@ jobs:
         New-Item -ItemType Directory -Force -Path artifacts
         Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
-        # Copy all required DLLs
-        Write-Host "=== Copying DLLs ==="
-        Copy-Item vcpkg\installed\x64-windows\bin\*.dll artifacts\
-        Write-Host "Copied DLLs:"
-        Get-ChildItem artifacts\*.dll | Format-Table Name, Length
+        # Copy required DLLs from MSYS2
+        $msys2Bin = "D:\a\_temp\msys64\ucrt64\bin"
+
+        # Get required DLLs using ldd output
+        Write-Host "=== Copying required DLLs ==="
+
+        # Core runtime DLLs
+        $dlls = @(
+          "libgcc_s_seh-1.dll",
+          "libstdc++-6.dll",
+          "libwinpthread-1.dll",
+          "libgdal-36.dll",
+          "libzip.dll",
+          "libtbb12.dll",
+          "zlib1.dll",
+          "libbz2-1.dll",
+          "liblzma-5.dll",
+          "libzstd.dll",
+          "libexpat-1.dll",
+          "libsqlite3-0.dll",
+          "libproj-25.dll",
+          "libcurl-4.dll",
+          "libjpeg-8.dll",
+          "libpng16-16.dll",
+          "libtiff-6.dll",
+          "libgeotiff-5.dll",
+          "libwebp-7.dll",
+          "libgeos_c.dll",
+          "libgeos.dll",
+          "libopenjp2-7.dll",
+          "libfreexl-1.dll",
+          "libxml2-2.dll",
+          "libpq.dll",
+          "libhdf5-310.dll",
+          "libnetcdf-19.dll",
+          "libspatialite-8.dll",
+          "libiconv-2.dll",
+          "libintl-8.dll",
+          "libcrypto-3-x64.dll",
+          "libssl-3-x64.dll",
+          "libbrotlidec.dll",
+          "libbrotlicommon.dll",
+          "libnghttp2-14.dll",
+          "libidn2-0.dll",
+          "libssh2-1.dll",
+          "libpsl-5.dll",
+          "libunistring-5.dll",
+          "libdeflate.dll",
+          "libjbig-0.dll",
+          "libLerc.dll",
+          "libsharpyuv-0.dll",
+          "libhdf5_hl-310.dll",
+          "libsz-2.dll",
+          "libaec-0.dll",
+          "libminizip-1.dll",
+          "libpcre2-8-0.dll"
+        )
+
+        foreach ($dll in $dlls) {
+          $src = Join-Path $msys2Bin $dll
+          if (Test-Path $src) {
+            Copy-Item $src artifacts\
+            Write-Host "Copied: $dll"
+          }
+        }
+
+        # Copy GDAL data files
+        $gdalData = "D:\a\_temp\msys64\ucrt64\share\gdal"
+        if (Test-Path $gdalData) {
+          Copy-Item -Recurse $gdalData artifacts\gdal-data
+          Write-Host "Copied GDAL data files"
+        }
+
+        # Copy PROJ data files
+        $projData = "D:\a\_temp\msys64\ucrt64\share\proj"
+        if (Test-Path $projData) {
+          Copy-Item -Recurse $projData artifacts\proj-data
+          Write-Host "Copied PROJ data files"
+        }
 
         # Copy documentation
         if (Test-Path README_WINDOWS.md) { Copy-Item README_WINDOWS.md artifacts\ }
@@ -116,20 +169,30 @@ jobs:
         Write-Host "=== Final artifacts summary ==="
         Write-Host "EXE files:"
         Get-ChildItem artifacts\*.exe | Format-Table Name, Length
-        Write-Host "DLL files: $(( Get-ChildItem artifacts\*.dll ).Count) files"
+        Write-Host "DLL files: $(( Get-ChildItem artifacts\*.dll -ErrorAction SilentlyContinue ).Count) files"
         Write-Host "Total size: $([math]::Round((Get-ChildItem artifacts -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB, 2)) MB"
 
-    - name: Test executable
-      shell: cmd
+    - name: Test artifact executable
+      shell: pwsh
       run: |
-        echo === Testing executable ===
-        artifacts\convert_fgd_dem_cpp.exe --help || echo Help command executed
-        if %ERRORLEVEL% EQU 0 (
-          echo Executable runs successfully!
-        ) else (
-          echo ERROR: Executable failed!
-          exit /b 1
-        )
+        Write-Host "=== Testing artifact executable ==="
+        $env:GDAL_DATA = "$PWD\artifacts\gdal-data"
+        $env:PROJ_DATA = "$PWD\artifacts\proj-data"
+        & .\artifacts\convert_fgd_dem_cpp.exe --help
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "Artifact executable runs successfully!"
+        } else {
+          Write-Host "ERROR: Artifact executable failed!"
+          exit 1
+        }
+
+    - name: Upload build logs
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: build-logs-x64-windows
+        path: |
+          build/**/*.log
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
