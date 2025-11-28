@@ -63,9 +63,9 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
             continue;
         }
 
-#ifdef _WIN32
-        // On Windows, use wide string path for proper Unicode support
-        std::ofstream out(output_path.wstring(), std::ios::binary);
+        // MSVC supports wstring in ofstream, MinGW/GCC does not
+#if defined(_MSC_VER)
+        std::ofstream out(output_path.wstring().c_str(), std::ios::binary);
 #else
         std::ofstream out(output_path, std::ios::binary);
 #endif
@@ -152,8 +152,8 @@ auto ZipHandler::extract_specific(
             continue;
         }
 
-#ifdef _WIN32
-        std::ofstream out(output_path.wstring(), std::ios::binary);
+#if defined(_MSC_VER)
+        std::ofstream out(output_path.wstring().c_str(), std::ios::binary);
 #else
         std::ofstream out(output_path, std::ios::binary);
 #endif
