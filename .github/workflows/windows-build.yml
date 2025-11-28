@@ -17,6 +17,9 @@ jobs:
     name: build (windows-x64-msvc)
     runs-on: windows-2022
 
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows-static
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -32,10 +35,7 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '01f602195983451bc83e72f4214af2cbc495aa94'
-
-    - name: Install dependencies via vcpkg
-      run: |
-        vcpkg install gdal:x64-windows-static libzip:x64-windows-static tbb:x64-windows-static
+        runVcpkgInstall: true
 
     - name: Configure CMake
       run: |
@@ -68,8 +68,8 @@ jobs:
         # Copy executable
         Copy-Item build-ninja\convert_fgd_dem_cpp.exe artifacts\
 
-        # Copy GDAL data files from vcpkg
-        $vcpkgInstalled = "$env:VCPKG_ROOT\installed\x64-windows-static"
+        # Copy GDAL data files from vcpkg_installed
+        $vcpkgInstalled = "vcpkg_installed\x64-windows-static"
 
         $gdalData = "$vcpkgInstalled\share\gdal"
         if (Test-Path $gdalData) {
@@ -77,7 +77,7 @@ jobs:
           Write-Host "Copied GDAL data files"
         }
 
-        # Copy PROJ data files from vcpkg
+        # Copy PROJ data files from vcpkg_installed
         $projData = "$vcpkgInstalled\share\proj"
         if (Test-Path $projData) {
           Copy-Item -Recurse $projData artifacts\proj-data
