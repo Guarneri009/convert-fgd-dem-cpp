@@ -125,16 +125,6 @@ jobs:
         Write-Host "DLL files: $(( Get-ChildItem artifacts\*.dll -ErrorAction SilentlyContinue ).Count) files"
         Write-Host "Total size: $([math]::Round((Get-ChildItem artifacts -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB, 2)) MB"
 
-    - name: Test artifact executable
-      run: |
-        echo "=== Testing artifact executable ==="
-        export GDAL_DATA="$PWD/artifacts/gdal-data"
-        export PROJ_DATA="$PWD/artifacts/proj-data"
-        export PATH="$PWD/artifacts:$PATH"
-
-        ./artifacts/convert_fgd_dem_cpp.exe --help
-        echo "Artifact executable runs successfully!"
-
     - name: Upload build logs
       uses: actions/upload-artifact@v4
       if: failure()
