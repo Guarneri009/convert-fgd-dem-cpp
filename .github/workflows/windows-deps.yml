@@ -1,0 +1,86 @@
+name: Windows Dependencies
+
+on:
+  # 手動実行のみ（依存関係を更新したい時だけ）
+  workflow_dispatch:
+  # vcpkg.jsonが変更された時（将来用）
+  push:
+    paths:
+      - 'vcpkg.json'
+      - '.github/workflows/windows-deps.yml'
+
+concurrency:
+  group: windows-deps
+  cancel-in-progress: false
+
+env:
+  VCPKG_COMMIT: "c82f74667287d3dc386bce81e44964370c91a289"
+
+jobs:
+  build-deps:
+    name: Build Dependencies
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Developer Command Prompt for Microsoft Visual C++
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Setup vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        git checkout ${{ env.VCPKG_COMMIT }}
+        cd ..
+        .\vcpkg\bootstrap-vcpkg.bat
+
+    - name: Install dependencies via vcpkg
+      shell: bash
+      run: |
+        ./vcpkg/vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
+      timeout-minutes: 120
+
+    - name: Verify installation
+      run: |
+        Write-Host "=== Installed packages ==="
+        .\vcpkg\vcpkg list
+        Write-Host ""
+        Write-Host "=== DLL files ==="
+        Get-ChildItem .\vcpkg\installed\x64-windows\bin\*.dll | Format-Table Name, Length
+
+    - name: Package DLLs
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Force -Path dlls
+        Copy-Item vcpkg\installed\x64-windows\bin\*.dll dlls\
+
+        # Create version info
+        @{
+          vcpkg_commit = "${{ env.VCPKG_COMMIT }}"
+          build_date = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+          dll_count = (Get-ChildItem dlls\*.dll).Count
+        } | ConvertTo-Json | Out-File dlls\version.json
+
+        Write-Host "=== Packaged DLLs ==="
+        Get-ChildItem dlls\ | Format-Table Name, Length
+        Write-Host "Total: $((Get-ChildItem dlls\*.dll).Count) DLLs"
+
+    - name: Upload DLLs artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-x64-dlls
+        path: dlls/
+        retention-days: 90
+
+    - name: Upload vcpkg installed (for EXE build)
+      uses: actions/upload-artifact@v4
+      with:
+        name: vcpkg-installed-x64-windows
+        path: |
+          vcpkg/installed/
+          vcpkg/scripts/buildsystems/vcpkg.cmake
+        retention-days: 90

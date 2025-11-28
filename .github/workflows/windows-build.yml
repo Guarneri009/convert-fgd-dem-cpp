@@ -9,31 +9,50 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-  # Pin vcpkg to a specific commit for reproducible builds
-  VCPKG_COMMIT: "c82f74667287d3dc386bce81e44964370c91a289"
-
 jobs:
-  build-osgeo4w:
-    name: build (windows-x64)
+  build-exe:
+    name: Build EXE (windows-x64)
     runs-on: windows-2022
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v7
+    - name: Download vcpkg installed
+      uses: dawidd6/action-download-artifact@v6
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        workflow: windows-deps.yml
+        name: vcpkg-installed-x64-windows
+        path: vcpkg/
+      continue-on-error: true
+      id: download-deps
 
-    - name: Uninstall system cmake
-      shell: bash
+    - name: Check if dependencies exist
+      id: check-deps
+      shell: pwsh
       run: |
-        choco uninstall cmake.install -y
+        if (Test-Path "vcpkg/installed/x64-windows/share/gdal/GDALConfig.cmake") {
+          Write-Host "Dependencies found from artifact!"
+          echo "deps_found=true" >> $env:GITHUB_OUTPUT
+        } else {
+          Write-Host "Dependencies NOT found. Need to build them."
+          Write-Host "Please run the 'Windows Dependencies' workflow first!"
+          echo "deps_found=false" >> $env:GITHUB_OUTPUT
+        }
+
+    - name: Fail if no dependencies
+      if: steps.check-deps.outputs.deps_found == 'false'
+      shell: pwsh
+      run: |
+        Write-Host "ERROR: Dependencies not found!"
+        Write-Host ""
+        Write-Host "Please run the 'Windows Dependencies' workflow first:"
+        Write-Host "  1. Go to Actions tab"
+        Write-Host "  2. Click 'Windows Dependencies'"
+        Write-Host "  3. Click 'Run workflow'"
+        Write-Host "  4. Wait for it to complete"
+        Write-Host "  5. Re-run this workflow"
+        exit 1
 
     - name: Install CMake and Ninja
       uses: lukka/get-cmake@latest
@@ -45,48 +64,12 @@ jobs:
       with:
         arch: x64
 
-    - name: Setup vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        git checkout ${{ env.VCPKG_COMMIT }}
-        cd ..
-        .\vcpkg\bootstrap-vcpkg.bat
-
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         max-size: 500M
         key: build-ccache-win64-${{ github.event.pull_request.base.ref || github.ref_name }}
         save: ${{ github.event_name == 'push' }}
-
-    - name: Tune ccache configuration
-      shell: bash
-      run: |
-        ccache --set-config sloppiness=pch_defines,time_macros,include_file_mtime,include_file_ctime
-
-    - name: Install dependencies via vcpkg
-      shell: bash
-      env:
-        X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
-      run: |
-        echo "Using vcpkg binary cache: $VCPKG_BINARY_SOURCES"
-        ./vcpkg/vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
-      timeout-minutes: 120
-
-    - name: Verify vcpkg installation
-      run: |
-        Write-Host "=== Installed packages ==="
-        .\vcpkg\vcpkg list
-        Write-Host ""
-        Write-Host "=== GDAL installation check ==="
-        if (Test-Path ".\vcpkg\installed\x64-windows\share\gdal\GDALConfig.cmake") {
-          Write-Host "GDAL found!"
-        } else {
-          Write-Host "ERROR: GDAL not found!"
-          Get-ChildItem -Recurse .\vcpkg\installed\ -Name "*gdal*" -ErrorAction SilentlyContinue
-          exit 1
-        }
 
     - name: Configure CMake
       shell: bash
@@ -118,25 +101,16 @@ jobs:
         New-Item -ItemType Directory -Force -Path artifacts
         Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
-        # Copy all required DLLs (GDAL, libzip, TBB, and their dependencies)
+        # Copy all required DLLs
         Write-Host "=== Copying DLLs ==="
         Copy-Item vcpkg\installed\x64-windows\bin\*.dll artifacts\
         Write-Host "Copied DLLs:"
         Get-ChildItem artifacts\*.dll | Format-Table Name, Length
 
         # Copy documentation
-        if (Test-Path README_WINDOWS.md) {
-          Copy-Item README_WINDOWS.md artifacts\
-        }
-        if (Test-Path README.md) {
-          Copy-Item README.md artifacts\
-        }
-        if (Test-Path LICENSE) {
-          Copy-Item LICENSE artifacts\
-        }
-        if (Test-Path convert_osgeo4w.bat) {
-          Copy-Item convert_osgeo4w.bat artifacts\convert.bat
-        }
+        if (Test-Path README_WINDOWS.md) { Copy-Item README_WINDOWS.md artifacts\ }
+        if (Test-Path README.md) { Copy-Item README.md artifacts\ }
+        if (Test-Path LICENSE) { Copy-Item LICENSE artifacts\ }
 
         Write-Host ""
         Write-Host "=== Final artifacts summary ==="
@@ -157,18 +131,8 @@ jobs:
           exit /b 1
         )
 
-    - name: Upload build logs
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: build-logs-x64-windows
-        path: |
-          build/**/*.log
-          vcpkg/buildtrees/**/*.log
-
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
-      id: artifact-win64
       with:
         name: convert-fgd-dem-cpp-windows-x64
         path: artifacts/
