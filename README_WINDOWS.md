@@ -2,7 +2,78 @@
 
 基盤地図情報DEMデータ（FG-GML形式のZIPファイル）をGeoTIFF形式に変換するツールです。
 
-## 必要なソフトウェア
+---
+
+## ビルド方法（開発者向け）
+
+### 必要なソフトウェア
+
+- **Visual Studio 2022** (Desktop development with C++ ワークロード)
+- **CMake 3.21以上** (Visual Studio に含まれています)
+- **vcpkg** (パッケージマネージャー)
+
+### 1. vcpkg のインストール
+
+```cmd
+git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+cd C:\vcpkg
+.\bootstrap-vcpkg.bat
+```
+
+環境変数を設定：
+```cmd
+setx VCPKG_ROOT "C:\vcpkg"
+```
+
+**重要**: 設定後、コマンドプロンプトを再起動してください。
+
+### 2. 依存パッケージのインストール
+
+```cmd
+cd C:\vcpkg
+.\vcpkg install gdal:x64-windows-static libzip:x64-windows-static tbb:x64-windows-static
+```
+
+**注意**: GDALのビルドには時間がかかります（30分〜1時間程度）。
+
+### 3. プロジェクトのビルド
+
+#### Visual Studio を使う場合
+
+**方法A: CMake プリセットを使う（推奨）**
+
+```cmd
+cd プロジェクトのフォルダ
+cmake --preset windows-x64-release
+cmake --build build-vs --config Release
+```
+
+**方法B: Visual Studio から直接開く**
+
+1. Visual Studio 2022 を起動
+2. 「フォルダーを開く」でプロジェクトフォルダを選択
+3. CMake が自動的に設定を検出
+4. ビルド → すべてビルド
+
+#### Ninja を使う場合（高速）
+
+Developer Command Prompt for VS 2022 を開いて：
+
+```cmd
+cd プロジェクトのフォルダ
+cmake --preset windows-ninja-release
+cmake --build build-ninja
+```
+
+### 4. ビルド成果物
+
+ビルド後、実行ファイルは以下に生成されます：
+- Visual Studio: `build-vs\Release\convert_fgd_dem_cpp.exe`
+- Ninja: `build-ninja\convert_fgd_dem_cpp.exe`
+
+---
+
+## 実行に必要なソフトウェア（ユーザー向け）
 
 このツールを使用するには、**OSGeo4W**が必要です。
 
