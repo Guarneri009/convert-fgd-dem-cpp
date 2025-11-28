@@ -11,6 +11,8 @@ concurrency:
 
 env:
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  # Pin vcpkg to a specific commit for reproducible builds
+  VCPKG_COMMIT: "c82f74667287d3dc386bce81e44964370c91a289"
 
 jobs:
   build-osgeo4w:
@@ -46,6 +48,9 @@ jobs:
     - name: Setup vcpkg
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        git checkout ${{ env.VCPKG_COMMIT }}
+        cd ..
         .\vcpkg\bootstrap-vcpkg.bat
 
     - name: Setup ccache
@@ -65,6 +70,7 @@ jobs:
       env:
         X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
       run: |
+        echo "Using vcpkg binary cache: $VCPKG_BINARY_SOURCES"
         ./vcpkg/vcpkg install gdal:x64-windows libzip:x64-windows tbb:x64-windows --triplet x64-windows
       timeout-minutes: 120
 
