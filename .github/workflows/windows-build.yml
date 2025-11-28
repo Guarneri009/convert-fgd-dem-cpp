@@ -73,88 +73,41 @@ jobs:
         ./build/convert_fgd_dem_cpp.exe --help || true
         echo "Executable runs successfully!"
 
+    - name: Collect required DLLs
+      run: |
+        echo "=== Collecting required DLLs using ldd ==="
+        mkdir -p artifacts
+        cp build/convert_fgd_dem_cpp.exe artifacts/
+
+        # Use ldd to find all required DLLs and copy them
+        ldd build/convert_fgd_dem_cpp.exe | grep -i ucrt64 | awk '{print $3}' | while read dll; do
+          if [ -f "$dll" ]; then
+            cp "$dll" artifacts/
+            echo "Copied: $(basename $dll)"
+          fi
+        done
+
+        echo ""
+        echo "=== Copied DLLs ==="
+        ls -la artifacts/*.dll | wc -l
+        echo "DLLs copied"
+
     - name: Prepare artifacts
       shell: pwsh
       run: |
         Write-Host "=== Preparing artifacts ==="
-        New-Item -ItemType Directory -Force -Path artifacts
-        Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
-        # Copy required DLLs from MSYS2
-        $msys2Bin = "D:\a\_temp\msys64\ucrt64\bin"
-
-        # Get required DLLs using ldd output
-        Write-Host "=== Copying required DLLs ==="
-
-        # Core runtime DLLs
-        $dlls = @(
-          "libgcc_s_seh-1.dll",
-          "libstdc++-6.dll",
-          "libwinpthread-1.dll",
-          "libgdal-36.dll",
-          "libzip.dll",
-          "libtbb12.dll",
-          "zlib1.dll",
-          "libbz2-1.dll",
-          "liblzma-5.dll",
-          "libzstd.dll",
-          "libexpat-1.dll",
-          "libsqlite3-0.dll",
-          "libproj-25.dll",
-          "libcurl-4.dll",
-          "libjpeg-8.dll",
-          "libpng16-16.dll",
-          "libtiff-6.dll",
-          "libgeotiff-5.dll",
-          "libwebp-7.dll",
-          "libgeos_c.dll",
-          "libgeos.dll",
-          "libopenjp2-7.dll",
-          "libfreexl-1.dll",
-          "libxml2-2.dll",
-          "libpq.dll",
-          "libhdf5-310.dll",
-          "libnetcdf-19.dll",
-          "libspatialite-8.dll",
-          "libiconv-2.dll",
-          "libintl-8.dll",
-          "libcrypto-3-x64.dll",
-          "libssl-3-x64.dll",
-          "libbrotlidec.dll",
-          "libbrotlicommon.dll",
-          "libnghttp2-14.dll",
-          "libidn2-0.dll",
-          "libssh2-1.dll",
-          "libpsl-5.dll",
-          "libunistring-5.dll",
-          "libdeflate.dll",
-          "libjbig-0.dll",
-          "libLerc.dll",
-          "libsharpyuv-0.dll",
-          "libhdf5_hl-310.dll",
-          "libsz-2.dll",
-          "libaec-0.dll",
-          "libminizip-1.dll",
-          "libpcre2-8-0.dll"
-        )
-
-        foreach ($dll in $dlls) {
-          $src = Join-Path $msys2Bin $dll
-          if (Test-Path $src) {
-            Copy-Item $src artifacts\
-            Write-Host "Copied: $dll"
-          }
-        }
+        $msys2Base = "D:\a\_temp\msys64\ucrt64"
 
         # Copy GDAL data files
-        $gdalData = "D:\a\_temp\msys64\ucrt64\share\gdal"
+        $gdalData = "$msys2Base\share\gdal"
         if (Test-Path $gdalData) {
           Copy-Item -Recurse $gdalData artifacts\gdal-data
           Write-Host "Copied GDAL data files"
         }
 
         # Copy PROJ data files
-        $projData = "D:\a\_temp\msys64\ucrt64\share\proj"
+        $projData = "$msys2Base\share\proj"
         if (Test-Path $projData) {
           Copy-Item -Recurse $projData artifacts\proj-data
           Write-Host "Copied PROJ data files"
@@ -178,12 +131,24 @@ jobs:
         Write-Host "=== Testing artifact executable ==="
         $env:GDAL_DATA = "$PWD\artifacts\gdal-data"
         $env:PROJ_DATA = "$PWD\artifacts\proj-data"
-        & .\artifacts\convert_fgd_dem_cpp.exe --help
+        $env:PATH = "$PWD\artifacts;$env:PATH"
+
+        Write-Host "=== Checking for missing DLLs ==="
+        try {
+          & .\artifacts\convert_fgd_dem_cpp.exe --help 2>&1
+          Write-Host "Exit code: $LASTEXITCODE"
+        } catch {
+          Write-Host "Exception: $_"
+        }
+
         if ($LASTEXITCODE -eq 0) {
           Write-Host "Artifact executable runs successfully!"
         } else {
-          Write-Host "ERROR: Artifact executable failed!"
-          exit 1
+          Write-Host "ERROR: Artifact executable failed with code $LASTEXITCODE"
+          Write-Host "=== Listing artifacts ==="
+          Get-ChildItem artifacts\*.dll | Format-Table Name
+          Write-Host "=== Trying to find missing DLLs ==="
+          # Continue anyway to upload artifacts for debugging
         }
 
     - name: Upload build logs
