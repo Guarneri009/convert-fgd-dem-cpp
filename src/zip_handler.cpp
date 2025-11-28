@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
 namespace fgd_converter::zip {
 
@@ -29,6 +30,11 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
     int err = 0;
     zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
+        zip_error_t error;
+        zip_error_init_with_code(&error, err);
+        std::cout << "zip_open failed: " << zip_error_strerror(&error)
+                  << " (path: " << abs_zip_path.string() << ")" << std::endl;
+        zip_error_fini(&error);
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
     }
@@ -90,6 +96,11 @@ auto ZipHandler::extract_specific(
     int err = 0;
     zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
+        zip_error_t error;
+        zip_error_init_with_code(&error, err);
+        std::cout << "zip_open failed: " << zip_error_strerror(&error)
+                  << " (path: " << abs_zip_path.string() << ")" << std::endl;
+        zip_error_fini(&error);
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
     }
@@ -156,6 +167,11 @@ auto ZipHandler::list_files(std::error_code &ec) const -> std::optional<std::vec
     int err = 0;
     zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
+        zip_error_t error;
+        zip_error_init_with_code(&error, err);
+        std::cout << "zip_open failed: " << zip_error_strerror(&error)
+                  << " (path: " << abs_zip_path.string() << ")" << std::endl;
+        zip_error_fini(&error);
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
     }
@@ -181,6 +197,11 @@ auto ZipHandler::read_file(std::string_view filename,
     int err = 0;
     zip_t *z = zip_open(abs_zip_path.string().c_str(), 0, &err);
     if (!z) {
+        zip_error_t error;
+        zip_error_init_with_code(&error, err);
+        std::cout << "zip_open failed: " << zip_error_strerror(&error)
+                  << " (path: " << abs_zip_path.string() << ")" << std::endl;
+        zip_error_fini(&error);
         ec = std::make_error_code(std::errc::io_error);
         return std::nullopt;
     }
