@@ -58,25 +58,37 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
         }
 
         zip_file_t *zf = zip_fopen_index(z, i, 0);
-        if (!zf)
+        if (!zf) {
+            std::cout << "zip_fopen_index failed for: " << name << std::endl;
             continue;
+        }
 
+#ifdef _WIN32
+        // On Windows, use wide string path for proper Unicode support
+        std::ofstream out(output_path.wstring(), std::ios::binary);
+#else
         std::ofstream out(output_path, std::ios::binary);
-        if (out) {
-            constexpr size_t buffer_size = 128 * 1024;  // 128KB buffer for better I/O performance
-            std::vector<char> buffer(buffer_size);
+#endif
+        if (!out) {
+            std::cout << "Failed to open output file: " << output_path.string() << std::endl;
+            zip_fclose(zf);
+            continue;
+        }
 
-            // Set output stream buffer for better I/O performance
-            out.rdbuf()->pubsetbuf(buffer.data(), buffer_size);
+        constexpr size_t buffer_size = 128 * 1024;  // 128KB buffer for better I/O performance
+        std::vector<char> read_buffer(buffer_size);
+        zip_int64_t sum = 0;
+        zip_int64_t len = 0;
 
-            std::vector<char> read_buffer(buffer_size);
-            zip_int64_t sum = 0;
-            zip_int64_t len = 0;
+        while ((len = zip_fread(zf, read_buffer.data(), read_buffer.size())) > 0) {
+            out.write(read_buffer.data(), len);
+            sum += len;
+        }
 
-            while ((len = zip_fread(zf, read_buffer.data(), read_buffer.size())) > 0) {
-                out.write(read_buffer.data(), len);
-                sum += len;
-            }
+        out.close();
+        if (!out) {
+            std::cout << "Failed to write file: " << output_path.string() << std::endl;
+        } else {
             extracted_files.push_back(output_path);
         }
         zip_fclose(zf);
@@ -135,23 +147,34 @@ auto ZipHandler::extract_specific(
         }
 
         zip_file_t *zf = zip_fopen_index(z, i, 0);
-        if (!zf)
+        if (!zf) {
+            std::cout << "zip_fopen_index failed for: " << name << std::endl;
             continue;
+        }
 
+#ifdef _WIN32
+        std::ofstream out(output_path.wstring(), std::ios::binary);
+#else
         std::ofstream out(output_path, std::ios::binary);
-        if (out) {
-            constexpr size_t buffer_size = 128 * 1024;  // 128KB buffer for better I/O performance
-            std::vector<char> buffer(buffer_size);
+#endif
+        if (!out) {
+            std::cout << "Failed to open output file: " << output_path.string() << std::endl;
+            zip_fclose(zf);
+            continue;
+        }
 
-            // Set output stream buffer for better I/O performance
-            out.rdbuf()->pubsetbuf(buffer.data(), buffer_size);
+        constexpr size_t buffer_size = 128 * 1024;  // 128KB buffer for better I/O performance
+        std::vector<char> read_buffer(buffer_size);
+        zip_int64_t len = 0;
 
-            std::vector<char> read_buffer(buffer_size);
-            zip_int64_t len = 0;
+        while ((len = zip_fread(zf, read_buffer.data(), read_buffer.size())) > 0) {
+            out.write(read_buffer.data(), len);
+        }
 
-            while ((len = zip_fread(zf, read_buffer.data(), read_buffer.size())) > 0) {
-                out.write(read_buffer.data(), len);
-            }
+        out.close();
+        if (!out) {
+            std::cout << "Failed to write file: " << output_path.string() << std::endl;
+        } else {
             extracted_files.push_back(output_path);
         }
         zip_fclose(zf);
