@@ -11,7 +11,6 @@
 
 namespace fgd_converter {
 
-// Simple span-like view for GCC 11 compatibility
 template <typename T>
 class span {
    public:
@@ -60,7 +59,6 @@ class Dem {
     [[nodiscard]] auto contents_to_array() const -> std::vector<std::vector<double>>;
     void get_xml_content();
 
-    // Getters with nodiscard attribute
     [[nodiscard]] auto get_metadata_list() const noexcept -> span<const Metadata> {
         return span<const Metadata>(meta_data_list.data(), meta_data_list.size());
     }
@@ -79,8 +77,8 @@ class Dem {
    private:
     void unzip_dem();
     [[nodiscard]] auto get_xml_paths() -> std::vector<std::filesystem::path>;
-    [[nodiscard]] auto format_metadata(std::string_view xml_content,
-                                       std::string_view mesh_code) -> Metadata;
+    [[nodiscard]] auto format_metadata(std::string_view xml_content, std::string_view mesh_code)
+        -> Metadata;
     void check_mesh_codes();
     void populate_metadata_list();
     void store_bounds_latlng();

@@ -10,33 +10,33 @@ template <typename T>
 class FlatArray2D {
    public:
     /**
-     * @brief Construct a 2D array with specified dimensions
-     * @param height Number of rows
-     * @param width Number of columns
-     * @param init_value Initial value for all elements (default: 0)
+     * @brief 指定した次元で2D配列を構築
+     * @param height 行数
+     * @param width 列数
+     * @param init_value 全要素の初期値 (デフォルト: 0)
      */
     FlatArray2D(size_t height, size_t width, T init_value = T{})
         : data_(height * width, init_value), width_(width), height_(height) {}
 
     /**
-     * @brief Access element at (row, col)
-     * @param row Row index
-     * @param col Column index
-     * @return Reference to the element
+     * @brief (row, col)の要素にアクセス
+     * @param row 行インデックス
+     * @param col 列インデックス
+     * @return 要素への参照
      */
     T& operator()(size_t row, size_t col) { return data_[row * width_ + col]; }
 
     /**
-     * @brief Access element at (row, col) (const version)
+     * @brief (row, col)の要素にアクセス (const版)
      */
     const T& operator()(size_t row, size_t col) const { return data_[row * width_ + col]; }
 
     /**
-     * @brief Get pointer to the beginning of a row
-     * @param row Row index
-     * @return Pointer to the first element of the row
+     * @brief 行の先頭へのポインタを取得
+     * @param row 行インデックス
+     * @return 行の最初の要素へのポインタ
      *
-     * This is useful for operations like memcpy:
+     * memcpyなどの操作に便利:
      * @code
      * memcpy(array.row(y), source, width * sizeof(T));
      * @endcode
@@ -46,27 +46,27 @@ class FlatArray2D {
     const T* row(size_t row) const { return &data_[row * width_]; }
 
     /**
-     * @brief Get raw pointer to the underlying data
+     * @brief 基礎データへの生ポインタを取得
      */
     T* data() { return data_.data(); }
 
     const T* data() const { return data_.data(); }
 
     /**
-     * @brief Get dimensions
+     * @brief 次元を取得
      */
     size_t width() const { return width_; }
     size_t height() const { return height_; }
     size_t size() const { return data_.size(); }
 
     /**
-     * @brief Fill all elements with a value
+     * @brief 全要素を指定値で埋める
      */
     void fill(T value) { std::fill(data_.begin(), data_.end(), value); }
 
     /**
-     * @brief Convert to vector<vector<T>> (for compatibility)
-     * Note: This creates a copy and is slow - avoid if possible
+     * @brief vector<vector<T>>に変換 (互換性のため)
+     * 注意: コピーを作成するため低速 - 可能な限り避けること
      */
     std::vector<std::vector<T>> to_2d_vector() const {
         std::vector<std::vector<T>> result;

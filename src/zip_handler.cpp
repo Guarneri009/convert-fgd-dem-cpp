@@ -57,7 +57,7 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
             break;
         }
 
-        // Skip directories
+        // ディレクトリをスキップ
         if (mz_zip_reader_entry_is_dir(reader) == MZ_OK) {
             err = mz_zip_reader_goto_next_entry(reader);
             continue;
@@ -67,12 +67,12 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
         std::filesystem::path output_path = abs_output_dir / filename;
         output_path = output_path.make_preferred();
 
-        // Create parent directories if needed
+        // 必要に応じて親ディレクトリを作成
         if (output_path.has_parent_path()) {
             std::filesystem::create_directories(output_path.parent_path());
         }
 
-        // Extract file
+        // ファイルを展開
         err = mz_zip_reader_entry_save_file(reader, output_path.string().c_str());
         if (err == MZ_OK) {
             extracted_files.push_back(output_path);
@@ -84,7 +84,7 @@ auto ZipHandler::extract(const std::filesystem::path &output_dir,
         err = mz_zip_reader_goto_next_entry(reader);
     }
 
-    // MZ_END_OF_LIST is expected when iteration completes
+    // 反復完了時にMZ_END_OF_LISTが期待される
     if (err != MZ_END_OF_LIST && err != MZ_OK) {
         std::cout << "Error during zip extraction (error: " << err << ")" << std::endl;
     }
@@ -128,7 +128,7 @@ auto ZipHandler::extract_specific(
             break;
         }
 
-        // Skip directories
+        // ディレクトリをスキップ
         if (mz_zip_reader_entry_is_dir(reader) == MZ_OK) {
             err = mz_zip_reader_goto_next_entry(reader);
             continue;
@@ -137,7 +137,7 @@ auto ZipHandler::extract_specific(
         std::string filename(file_info->filename);
         std::string_view name_view(filename);
 
-        // Check if filename matches any pattern
+        // ファイル名がパターンに一致するか確認
         bool should_extract = false;
         for (auto pattern : file_patterns) {
             if (name_view.find(pattern) != std::string_view::npos) {
@@ -207,7 +207,7 @@ auto ZipHandler::list_files(std::error_code &ec) const -> std::optional<std::vec
             break;
         }
 
-        // Skip directories
+        // ディレクトリをスキップ
         if (mz_zip_reader_entry_is_dir(reader) != MZ_OK) {
             filenames.emplace_back(file_info->filename);
         }
@@ -240,7 +240,7 @@ auto ZipHandler::read_file(std::string_view filename,
         return std::nullopt;
     }
 
-    // Locate the file
+    // ファイルを検索
     err = mz_zip_reader_locate_entry(reader, std::string(filename).c_str(), 0);
     if (err != MZ_OK) {
         mz_zip_reader_close(reader);
@@ -249,7 +249,7 @@ auto ZipHandler::read_file(std::string_view filename,
         return std::nullopt;
     }
 
-    // Get file info for size
+    // サイズ取得のためファイル情報を取得
     mz_zip_file *file_info = nullptr;
     err = mz_zip_reader_entry_get_info(reader, &file_info);
     if (err != MZ_OK) {
@@ -259,7 +259,7 @@ auto ZipHandler::read_file(std::string_view filename,
         return std::nullopt;
     }
 
-    // Open entry for reading
+    // 読み取り用にエントリを開く
     err = mz_zip_reader_entry_open(reader);
     if (err != MZ_OK) {
         mz_zip_reader_close(reader);
@@ -268,7 +268,7 @@ auto ZipHandler::read_file(std::string_view filename,
         return std::nullopt;
     }
 
-    // Read file content
+    // ファイル内容を読み取り
     std::vector<uint8_t> buffer(static_cast<size_t>(file_info->uncompressed_size));
     int32_t bytes_read =
         mz_zip_reader_entry_read(reader, buffer.data(), static_cast<int32_t>(buffer.size()));

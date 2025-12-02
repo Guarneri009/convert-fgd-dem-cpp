@@ -57,7 +57,7 @@ void Dem::get_xml_content() {
 }
 
 void Dem::unzip_dem() {
-    // Create unique extraction folder based on the zip filename
+    // ZIPファイル名に基づいてユニークな展開フォルダを作成
     std::filesystem::path extract_to = std::filesystem::path("extracted") / import_path.stem();
     extract_to = std::filesystem::absolute(extract_to).make_preferred();
     std::filesystem::create_directories(extract_to);
@@ -65,7 +65,7 @@ void Dem::unzip_dem() {
     if (zip::is_zip_file(import_path)) {
         zip::ZipHandler handler(import_path);
 
-        // Extract all XML files
+        // すべてのXMLファイルを展開
         std::error_code ec;
         auto result = handler.extract(extract_to, ec);
         if (!result) {
@@ -74,7 +74,7 @@ void Dem::unzip_dem() {
             throw std::runtime_error(ss.str());
         }
 
-        // Also check for nested zip files
+        // ネストされたZIPファイルも確認
         for (const auto &file : *result) {
             if (zip::is_zip_file(file)) {
                 zip::ZipHandler nested_handler(file);
@@ -90,7 +90,7 @@ void Dem::unzip_dem() {
 
 auto Dem::get_xml_paths() -> std::vector<std::filesystem::path> {
     std::vector<std::filesystem::path> xml_files;
-    // Use the same unique extraction folder
+    // 同じユニークな展開フォルダを使用
     std::filesystem::path extract_dir = std::filesystem::path("extracted") / import_path.stem();
     extract_dir = std::filesystem::absolute(extract_dir).make_preferred();
 
@@ -104,7 +104,7 @@ auto Dem::get_xml_paths() -> std::vector<std::filesystem::path> {
         }
     }
 
-    // Sort by filename
+    // ファイル名でソート
     std::sort(xml_files.begin(), xml_files.end(),
               [](const auto &a, const auto &b) { return a.filename() < b.filename(); });
 
@@ -117,7 +117,7 @@ auto Dem::format_metadata(std::string_view xml_content, std::string_view mesh_co
 
     metadata.mesh_code = std::string(mesh_code);
 
-    // Get bounds
+    // 境界を取得
     if (auto lower = parser.get_lower_corner()) {
         metadata.lower_corner_x = lower->x;
         metadata.lower_corner_y = lower->y;
@@ -128,19 +128,19 @@ auto Dem::format_metadata(std::string_view xml_content, std::string_view mesh_co
         metadata.upper_corner_y = upper->y;
     }
 
-    // Get grid envelope
+    // グリッドエンベロープを取得
     if (auto envelope = parser.get_grid_envelope()) {
         metadata.x_length = envelope->high_x - envelope->low_x + 1;
         metadata.y_length = envelope->high_y - envelope->low_y + 1;
     }
 
-    // Get start point
+    // 開始点を取得
     if (auto start = parser.get_start_point()) {
         metadata.start_x = start->x;
         metadata.start_y = start->y;
     }
 
-    // Get DEM type
+    // DEM種別を取得
     if (auto type = parser.get_dem_type()) {
         metadata.type = *type;
     }
@@ -157,7 +157,7 @@ void Dem::check_mesh_codes() {
         }
     }
 
-    // Check for duplicates
+    // 重複を確認
     auto sorted_codes = mesh_code_list;
     std::sort(sorted_codes.begin(), sorted_codes.end());
     auto last = std::unique(sorted_codes.begin(), sorted_codes.end());
@@ -169,11 +169,11 @@ void Dem::check_mesh_codes() {
 }
 
 void Dem::populate_metadata_list() {
-    // Pre-allocate for thread-safe parallel access
+    // スレッドセーフな並列アクセスのため事前割り当て
     size_t size = std::min(all_content_list.size(), mesh_code_list.size());
     meta_data_list.resize(size);
 
-    // Process metadata in parallel using TBB (cross-platform)
+    // TBBを使用してメタデータを並列処理 (クロスプラットフォーム)
     std::vector<size_t> indices(size);
     std::iota(indices.begin(), indices.end(), 0);
 
@@ -210,7 +210,7 @@ auto Dem::get_np_array(std::string_view xml_content) -> std::vector<std::vector<
 
     const auto &elevation = (*tuple_result)[0];
 
-    // Get grid dimensions and start point
+    // グリッド寸法と開始点を取得
     auto envelope = parser.get_grid_envelope();
     auto start = parser.get_start_point();
 
@@ -233,18 +233,18 @@ auto Dem::get_np_array(std::string_view xml_content) -> std::vector<std::vector<
             array(y, x) = elevation[index];
             ++index;
         }
-        current_start_x = 0;  // After first row, start from x=0
+        current_start_x = 0;  // 最初の行の後はx=0から開始
     }
 
-    // Convert to vector<vector<double>> for compatibility
+    // 互換性のためvector<vector<double>>に変換
     return array.to_2d_vector();
 }
 
 void Dem::store_np_array_list() {
-    // Pre-allocate for thread-safe parallel access
+    // スレッドセーフな並列アクセスのため事前割り当て
     np_array_list.resize(all_content_list.size());
 
-    // Process arrays in parallel using TBB (cross-platform)
+    // TBBを使用して配列を並列処理 (クロスプラットフォーム)
     std::vector<size_t> indices(all_content_list.size());
     std::iota(indices.begin(), indices.end(), 0);
 

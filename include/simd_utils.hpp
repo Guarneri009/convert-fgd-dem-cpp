@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstring>
 
-// Platform detection for SIMD intrinsics
+// SIMDイントリンシクスのプラットフォーム検出
 #if defined(__x86_64__) || defined(_M_X64)
 #    if defined(__AVX2__)
 #        define HAS_AVX2 1
@@ -14,7 +14,7 @@
 #    include <arm_neon.h>
 #endif
 
-// SIMD utilities for faster string processing
+// 高速文字列処理用SIMDユーティリティ
 namespace fgd_converter::simd {
 
 #if defined(HAS_AVX2)
@@ -23,19 +23,19 @@ inline const char* find_char_simd(const char* ptr, const char* end, char target)
     if (ptr >= end)
         return nullptr;
 
-    // For small strings, memchr is often faster
-    // Use standard memchr which is already highly optimized with SSE2/AVX2
+    // 短い文字列ではmemchrの方が速いことが多い
+    // SSE2/AVX2で高度に最適化された標準memchrを使用
     return static_cast<const char*>(std::memchr(ptr, target, end - ptr));
 }
 
 /**
- * @brief Skip whitespace using AVX2
+ * @brief AVX2を使用して空白をスキップ
  *
- * Quickly skip spaces, tabs, newlines, and carriage returns.
+ * スペース、タブ、改行、キャリッジリターンを高速にスキップ。
  */
 inline const char* skip_whitespace_simd(const char* ptr, const char* end) {
-    // Scalar version is simpler and often faster for small whitespace runs
-    // Use scalar code instead of complex SIMD logic
+    // スカラー版はシンプルで、短い空白連続には速いことが多い
+    // 複雑なSIMDロジックの代わりにスカラーコードを使用
     while (ptr < end && (*ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r')) {
         ++ptr;
     }
@@ -48,17 +48,17 @@ inline const char* find_char_simd(const char* ptr, const char* end, char target)
     if (ptr >= end)
         return nullptr;
 
-    // Use standard memchr which is optimized for ARM NEON
+    // ARM NEON用に最適化された標準memchrを使用
     return static_cast<const char*>(std::memchr(ptr, target, end - ptr));
 }
 
 /**
- * @brief Skip whitespace using NEON
+ * @brief NEONを使用して空白をスキップ
  *
- * Quickly skip spaces, tabs, newlines, and carriage returns.
+ * スペース、タブ、改行、キャリッジリターンを高速にスキップ。
  */
 inline const char* skip_whitespace_simd(const char* ptr, const char* end) {
-    // Scalar version is simpler and often faster for small whitespace runs
+    // スカラー版はシンプルで、短い空白連続には速いことが多い
     while (ptr < end && (*ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r')) {
         ++ptr;
     }
@@ -66,7 +66,7 @@ inline const char* skip_whitespace_simd(const char* ptr, const char* end) {
 }
 
 #else
-// Fallback to standard functions for systems without SIMD support
+// SIMDサポートのないシステム用に標準関数へフォールバック
 inline const char* find_char_simd(const char* ptr, const char* end, char target) {
     return static_cast<const char*>(std::memchr(ptr, target, end - ptr));
 }
@@ -79,7 +79,7 @@ inline const char* skip_whitespace_simd(const char* ptr, const char* end) {
 }
 #endif
 
-// Legacy aliases for backward compatibility
+// 後方互換性のためのレガシーエイリアス
 inline const char* find_char_avx2(const char* ptr, const char* end, char target) {
     return find_char_simd(ptr, end, target);
 }

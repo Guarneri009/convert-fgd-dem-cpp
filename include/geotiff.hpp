@@ -23,7 +23,7 @@ class GeoTiff {
     explicit GeoTiff(Config config);
     ~GeoTiff();
 
-    // Move-only type
+    // ムーブのみ可能な型
     GeoTiff(const GeoTiff&) = delete;
     GeoTiff& operator=(const GeoTiff&) = delete;
     GeoTiff(GeoTiff&&) noexcept;

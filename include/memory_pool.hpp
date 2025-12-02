@@ -9,31 +9,31 @@ namespace fgd_converter {
 template <typename T>
 class MemoryPool {
    public:
-    static constexpr size_t BLOCK_SIZE = 1024 * 1024 / sizeof(T);  // 1MB per block
+    static constexpr size_t BLOCK_SIZE = 1024 * 1024 / sizeof(T);  // ブロックあたり1MB
 
     MemoryPool() { allocate_new_block(); }
 
     ~MemoryPool() = default;
 
-    // Disable copy
+    // コピー禁止
     MemoryPool(const MemoryPool&) = delete;
     MemoryPool& operator=(const MemoryPool&) = delete;
 
-    // Enable move
+    // ムーブ可能
     MemoryPool(MemoryPool&&) noexcept = default;
     MemoryPool& operator=(MemoryPool&&) noexcept = default;
 
     /**
-     * @brief Allocate n elements from the pool
+     * @brief プールからn個の要素を割り当て
      */
     T* allocate(size_t n) {
-        // If request is too large for a single block, use standard allocation
+        // 要求が単一ブロックより大きい場合は標準割り当てを使用
         if (n > BLOCK_SIZE) {
             large_allocations_.push_back(std::unique_ptr<T[]>(new T[n]));
             return large_allocations_.back().get();
         }
 
-        // Check if current block has enough space
+        // 現在のブロックに十分な空きがあるか確認
         if (!current_block_ || current_offset_ + n > BLOCK_SIZE) {
             allocate_new_block();
         }
@@ -44,15 +44,15 @@ class MemoryPool {
     }
 
     /**
-     * @brief Deallocate (no-op for pool allocator)
+     * @brief 解放 (プールアロケータでは何もしない)
      */
     void deallocate(T*, size_t) noexcept {
-        // Pool allocator doesn't free individual allocations
-        // Memory is freed when the pool is destroyed
+        // プールアロケータは個別の割り当てを解放しない
+        // メモリはプールが破棄されたときに解放される
     }
 
     /**
-     * @brief Clear all allocations and reset the pool
+     * @brief すべての割り当てをクリアしてプールをリセット
      */
     void clear() {
         blocks_.clear();
@@ -63,12 +63,12 @@ class MemoryPool {
     }
 
     /**
-     * @brief Get total memory allocated by the pool
+     * @brief プールが割り当てた総メモリを取得
      */
     size_t total_allocated_bytes() const {
         size_t total = blocks_.size() * BLOCK_SIZE * sizeof(T);
         for (const auto& alloc : large_allocations_) {
-            total += sizeof(T);  // Approximation
+            total += sizeof(T);  // 近似値
         }
         return total;
     }
@@ -87,7 +87,7 @@ class MemoryPool {
 };
 
 /**
- * @brief STL-compatible allocator wrapper for MemoryPool
+ * @brief MemoryPool用のSTL互換アロケータラッパー
  */
 template <typename T>
 class PoolAllocator {

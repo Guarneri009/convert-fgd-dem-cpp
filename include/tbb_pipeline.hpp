@@ -7,7 +7,7 @@
 
 #include "memory_mapped_file.hpp"
 
-// Check if TBB is available
+// TBBが利用可能か確認
 #ifdef __has_include
 #    if __has_include(<tbb/parallel_pipeline.h>)
 #        define HAS_TBB_PIPELINE 1
@@ -26,20 +26,20 @@ class TBBPipeline {
     using ProcessFunc = std::function<ResultType(std::string_view)>;
 
     /**
-     * @brief Create TBB pipeline with custom processing function
+     * @brief カスタム処理関数でTBBパイプラインを作成
      *
-     * @param process_func Function to process loaded file content
-     * @param max_tokens Maximum items in flight (default: auto-detect)
+     * @param process_func 読み込んだファイル内容を処理する関数
+     * @param max_tokens 同時処理中の最大アイテム数 (デフォルト: 自動検出)
      */
     explicit TBBPipeline(ProcessFunc process_func, size_t max_tokens = 0)
         : process_func_(std::move(process_func)),
           max_tokens_(max_tokens == 0 ? std::thread::hardware_concurrency() * 3 : max_tokens) {}
 
     /**
-     * @brief Process files through TBB pipeline
+     * @brief TBBパイプラインでファイルを処理
      *
-     * @param file_paths Paths to files to process
-     * @return Vector of processing results in same order as input
+     * @param file_paths 処理するファイルのパス
+     * @return 入力と同じ順序の処理結果ベクター
      */
     std::vector<ResultType> process_files(const std::vector<std::filesystem::path>& file_paths) {
         if (file_paths.empty()) {
@@ -49,11 +49,11 @@ class TBBPipeline {
         std::vector<ResultType> results;
         results.reserve(file_paths.size());
 
-        // Atomic counter for file reading stage
+        // ファイル読み取りステージ用のアトミックカウンター
         std::atomic<size_t> file_index{0};
         const size_t total_files = file_paths.size();
 
-        // Stage 1: File reading (serial - I/O bound)
+        // ステージ1: ファイル読み取り (シリアル - I/Oバウンド)
         auto read_stage = tbb::make_filter<void, std::optional<std::pair<size_t, std::string>>>(
             tbb::filter_mode::serial_in_order,
             [&](tbb::flow_control& fc) -> std::optional<std::pair<size_t, std::string>> {
@@ -64,7 +64,7 @@ class TBBPipeline {
                     return std::nullopt;
                 }
 
-                // Memory-mapped file reading
+                // メモリマップドファイル読み取り
                 MemoryMappedFile mmap(file_paths[idx]);
                 if (!mmap.is_open()) {
                     return std::make_pair(idx, std::string{});
@@ -73,7 +73,7 @@ class TBBPipeline {
                 return std::make_pair(idx, std::string(mmap.view()));
             });
 
-        // Stage 2: XML parsing (parallel - CPU bound)
+        // ステージ2: XMLパース (並列 - CPUバウンド)
         auto parse_stage = tbb::make_filter<std::optional<std::pair<size_t, std::string>>,
                                             std::optional<std::pair<size_t, ResultType>>>(
             tbb::filter_mode::parallel,
@@ -88,12 +88,12 @@ class TBBPipeline {
                     return std::make_pair(idx, ResultType{});
                 }
 
-                // Process with user-provided function
+                // ユーザー提供の関数で処理
                 ResultType result = process_func_(content);
                 return std::make_pair(idx, std::move(result));
             });
 
-        // Stage 3: Result collection (serial - maintain order)
+        // ステージ3: 結果収集 (シリアル - 順序維持)
         auto collect_stage = tbb::make_filter<std::optional<std::pair<size_t, ResultType>>, void>(
             tbb::filter_mode::serial_in_order,
             [&](std::optional<std::pair<size_t, ResultType>> input) {
@@ -102,7 +102,7 @@ class TBBPipeline {
 
                 auto [idx, result] = std::move(*input);
 
-                // Ensure results vector is large enough
+                // 結果ベクターが十分な大きさであることを確認
                 if (results.size() <= idx) {
                     results.resize(idx + 1);
                 }
@@ -110,14 +110,14 @@ class TBBPipeline {
                 results[idx] = std::move(result);
             });
 
-        // Execute pipeline with limited number of tokens (items in flight)
+        // 制限されたトークン数 (同時処理中のアイテム数) でパイプラインを実行
         tbb::parallel_pipeline(max_tokens_, read_stage & parse_stage & collect_stage);
 
         return results;
     }
 
     /**
-     * @brief Set maximum number of threads for TBB
+     * @brief TBBの最大スレッド数を設定
      */
     static void set_max_threads(size_t num_threads) {
         static tbb::global_control global_limit(tbb::global_control::max_allowed_parallelism,
@@ -131,7 +131,7 @@ class TBBPipeline {
 
 #else
 
-// Fallback when TBB pipeline is not available - use simple TBB parallel processing
+// TBBパイプラインが利用できない場合のフォールバック - シンプルなTBB並列処理を使用
 #    include <tbb/parallel_for.h>
 
 template <typename ResultType>
@@ -145,7 +145,7 @@ class TBBPipeline {
     std::vector<ResultType> process_files(const std::vector<std::filesystem::path>& file_paths) {
         std::vector<ResultType> results(file_paths.size());
 
-        // Use TBB parallel_for for simple parallel processing
+        // シンプルな並列処理のためにTBB parallel_forを使用
         tbb::parallel_for(tbb::blocked_range<size_t>(0, file_paths.size()),
                           [&](const tbb::blocked_range<size_t>& range) {
                               for (size_t i = range.begin(); i != range.end(); ++i) {

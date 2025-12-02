@@ -15,7 +15,7 @@ class ZipHandler {
     explicit ZipHandler(std::filesystem::path zip_path);
     ~ZipHandler();
 
-    // Move-only type
+    // ムーブのみ可能な型
     ZipHandler(const ZipHandler&) = delete;
     ZipHandler& operator=(const ZipHandler&) = delete;
     ZipHandler(ZipHandler&&) noexcept;
@@ -39,7 +39,7 @@ class ZipHandler {
     std::unique_ptr<Impl> pImpl;
 };
 
-// Utility functions
+// ユーティリティ関数
 [[nodiscard]] inline auto is_zip_file(const std::filesystem::path& path) noexcept -> bool {
     return path.extension() == ".zip" || path.extension() == ".ZIP";
 }

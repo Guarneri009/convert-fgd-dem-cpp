@@ -84,11 +84,11 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        // Create output directories
+        // 出力ディレクトリを作成
         fs::create_directories(output_folder);
         fs::create_directories(extract_folder);
 
-        // First pass: collect all zip files
+        // 第1パス: すべてのzipファイルを収集
         std::vector<fs::path> zip_files;
         for (const auto &entry : fs::recursive_directory_iterator(input_folder)) {
             if (entry.is_regular_file() && fgd_converter::zip::is_zip_file(entry.path())) {
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // Extract all zip files in parallel
+        // すべてのzipファイルを並列展開
         std::cout << "Extracting " << zip_files.size() << " ZIP files in parallel...\n";
         tbb::parallel_for_each(zip_files, [&](const fs::path &zip_path) {
             std::stringstream ss;
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
             return 0;
         }
 
-        // Second pass: collect nested zips and process in parallel
+        // 第2パス: ネストされたzipを収集して並列処理
         std::vector<fs::path> nested_zips;
         for (const auto &entry : fs::recursive_directory_iterator(extract_folder)) {
             if (entry.is_regular_file() && fgd_converter::zip::is_zip_file(entry.path())) {
@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // Process all zips in parallel using TBB (cross-platform)
-        std::mutex cout_mutex;  // Protect std::cout from race conditions
+        // TBBを使用してすべてのzipを並列処理 (クロスプラットフォーム)
+        std::mutex cout_mutex;  // std::coutを競合状態から保護
 
         tbb::parallel_for_each(nested_zips, [&](const fs::path &zip_path) {
             fs::path output_tif = output_folder / zip_path.stem();

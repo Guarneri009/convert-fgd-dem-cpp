@@ -18,12 +18,12 @@ namespace fgd_converter {
 class MemoryMappedFile {
    public:
     /**
-     * @brief Open a file with memory mapping
-     * @param path File path to map
+     * @brief メモリマッピングでファイルを開く
+     * @param path マッピングするファイルパス
      */
     explicit MemoryMappedFile(const std::filesystem::path& path) {
 #ifdef _WIN32
-        // Windows implementation
+        // Windows実装
         file_handle_ = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
                                    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
@@ -57,7 +57,7 @@ class MemoryMappedFile {
             file_handle_ = INVALID_HANDLE_VALUE;
         }
 #else
-        // POSIX implementation (Linux, macOS)
+        // POSIX実装 (Linux, macOS)
         fd_ = open(path.c_str(), O_RDONLY);
         if (fd_ == -1) {
             return;
@@ -79,17 +79,17 @@ class MemoryMappedFile {
             data_ = nullptr;
         }
 
-        // Advise kernel about access pattern
+        // カーネルにアクセスパターンを通知
         if (data_) {
-            // MADV_SEQUENTIAL: We'll read sequentially
-            // MADV_WILLNEED: Start prefetching
+            // MADV_SEQUENTIAL: 順次読み取りを行う
+            // MADV_WILLNEED: プリフェッチを開始
             madvise(data_, size_, MADV_SEQUENTIAL | MADV_WILLNEED);
         }
 #endif
     }
 
     /**
-     * @brief Destructor - unmaps the file
+     * @brief デストラクタ - ファイルのマッピングを解除
      */
     ~MemoryMappedFile() {
 #ifdef _WIN32
@@ -107,11 +107,11 @@ class MemoryMappedFile {
 #endif
     }
 
-    // Non-copyable
+    // コピー禁止
     MemoryMappedFile(const MemoryMappedFile&) = delete;
     MemoryMappedFile& operator=(const MemoryMappedFile&) = delete;
 
-    // Movable
+    // ムーブ可能
     MemoryMappedFile(MemoryMappedFile&& other) noexcept
         : data_(other.data_),
           size_(other.size_)
@@ -136,10 +136,10 @@ class MemoryMappedFile {
 
     MemoryMappedFile& operator=(MemoryMappedFile&& other) noexcept {
         if (this != &other) {
-            // Clean up current resources
+            // 現在のリソースをクリーンアップ
             this->~MemoryMappedFile();
 
-            // Move from other
+            // otherからムーブ
             data_ = other.data_;
             size_ = other.size_;
 #ifdef _WIN32
@@ -149,7 +149,7 @@ class MemoryMappedFile {
             fd_ = other.fd_;
 #endif
 
-            // Reset other
+            // otherをリセット
             other.data_ = nullptr;
             other.size_ = 0;
 #ifdef _WIN32
@@ -163,12 +163,12 @@ class MemoryMappedFile {
     }
 
     /**
-     * @brief Check if mapping was successful
+     * @brief マッピングが成功したか確認
      */
     bool is_open() const { return data_ != nullptr; }
 
     /**
-     * @brief Get string view of the mapped data
+     * @brief マッピングデータのstring_viewを取得
      */
     std::string_view view() const {
         if (!data_)
@@ -177,12 +177,12 @@ class MemoryMappedFile {
     }
 
     /**
-     * @brief Get raw pointer to mapped data
+     * @brief マッピングデータへの生ポインタを取得
      */
     const void* data() const { return data_; }
 
     /**
-     * @brief Get size of mapped data
+     * @brief マッピングデータのサイズを取得
      */
     size_t size() const { return size_; }
 

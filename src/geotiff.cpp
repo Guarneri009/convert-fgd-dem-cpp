@@ -10,7 +10,7 @@
 #include <execution>
 #include <iostream>
 
-// Platform detection for SIMD intrinsics
+// SIMDイントリンシクスのプラットフォーム検出
 #if defined(__x86_64__) || defined(_M_X64)
 #    if defined(__AVX2__)
 #        define HAS_AVX2 1
@@ -58,16 +58,16 @@ void GeoTiff::write_raster_bands(bool rgbify) {
         return;
 
     if (rgbify) {
-        // Terrain RGB conversion (Mapbox format)
-        // Formula: height = (R * 65536 + G * 256 + B) / 10 - 10000
-        // Inverse: offset_height = (height + 10000) * 10 = height * 10 + 100000
+        // Terrain RGB変換 (Mapbox形式)
+        // 計算式: height = (R * 65536 + G * 256 + B) / 10 - 10000
+        // 逆変換: offset_height = (height + 10000) * 10 = height * 10 + 100000
         constexpr double NO_DATA_VALUE = -9999.0;
         constexpr int R_MIN_HEIGHT = 65536;
         constexpr int G_MIN_HEIGHT = 256;
 
         auto convert_height_to_R = [](double height) -> uint8_t {
             if (height <= NO_DATA_VALUE) {
-                return 1;  // NoData value
+                return 1;  // NoData値
             }
             int offset_height = static_cast<int>(height * 10) + 100000;
             return static_cast<uint8_t>(offset_height / R_MIN_HEIGHT);
@@ -75,7 +75,7 @@ void GeoTiff::write_raster_bands(bool rgbify) {
 
         auto convert_height_to_G = [](double height, uint8_t r_value) -> uint8_t {
             if (height <= NO_DATA_VALUE) {
-                return 134;  // NoData value
+                return 134;  // NoData値
             }
             int offset_height = static_cast<int>(height * 10) + 100000;
             return static_cast<uint8_t>((offset_height - r_value * R_MIN_HEIGHT) / G_MIN_HEIGHT);
@@ -83,14 +83,14 @@ void GeoTiff::write_raster_bands(bool rgbify) {
 
         auto convert_height_to_B = [](double height, uint8_t r_value, uint8_t g_value) -> uint8_t {
             if (height <= NO_DATA_VALUE) {
-                return 160;  // NoData value
+                return 160;  // NoData値
             }
             int offset_height = static_cast<int>(height * 10) + 100000;
             return static_cast<uint8_t>(offset_height - r_value * R_MIN_HEIGHT -
                                         g_value * G_MIN_HEIGHT);
         };
 
-        // Create RGB bands using Terrain RGB encoding
+        // Terrain RGBエンコーディングを使用してRGBバンドを作成
         std::vector<uint8_t> red_band(pImpl->x_length * pImpl->y_length);
         std::vector<uint8_t> green_band(pImpl->x_length * pImpl->y_length);
         std::vector<uint8_t> blue_band(pImpl->x_length * pImpl->y_length);
@@ -121,42 +121,42 @@ void GeoTiff::write_raster_bands(bool rgbify) {
             pImpl->y_length, GDT_Byte, 0, 0);
         (void)err1;
         (void)err2;
-        (void)err3;  // Suppress unused variable warning if not checking
+        (void)err3;  // チェックしない場合の未使用変数警告を抑制
     } else {
-        // Single band float32 - optimized conversion
+        // 単一バンドfloat32 - 最適化された変換
         std::vector<float> flat_array(pImpl->x_length * pImpl->y_length);
 
-        // Convert double to float using SIMD or parallel processing
+        // SIMDまたは並列処理を使用してdoubleからfloatに変換
         size_t idx = 0;
         for (const auto &row : pImpl->np_array) {
             const size_t row_size = row.size();
 
 #if defined(HAS_AVX2)
-            // AVX2 SIMD conversion (4 doubles at a time)
+            // AVX2 SIMD変換 (一度に4つのdouble)
             size_t i = 0;
             for (; i + 4 <= row_size; i += 4) {
                 __m256d src = _mm256_loadu_pd(&row[i]);
                 __m128 dst = _mm256_cvtpd_ps(src);
                 _mm_storeu_ps(&flat_array[idx + i], dst);
             }
-            // Handle remaining elements
+            // 残りの要素を処理
             for (; i < row_size; ++i) {
                 flat_array[idx + i] = static_cast<float>(row[i]);
             }
 #elif defined(HAS_NEON)
-            // NEON SIMD conversion (2 doubles at a time)
+            // NEON SIMD変換 (一度に2つのdouble)
             size_t i = 0;
             for (; i + 2 <= row_size; i += 2) {
                 float64x2_t src = vld1q_f64(&row[i]);
                 float32x2_t dst = vcvt_f32_f64(src);
                 vst1_f32(&flat_array[idx + i], dst);
             }
-            // Handle remaining elements
+            // 残りの要素を処理
             for (; i < row_size; ++i) {
                 flat_array[idx + i] = static_cast<float>(row[i]);
             }
 #else
-            // Standard conversion
+            // 標準的な変換
             for (size_t i = 0; i < row_size; ++i) {
                 flat_array[idx + i] = static_cast<float>(row[i]);
             }
@@ -167,9 +167,9 @@ void GeoTiff::write_raster_bands(bool rgbify) {
         CPLErr err = pImpl->dataset->GetRasterBand(1)->RasterIO(
             GF_Write, 0, 0, pImpl->x_length, pImpl->y_length, flat_array.data(), pImpl->x_length,
             pImpl->y_length, GDT_Float32, 0, 0);
-        (void)err;  // Suppress unused variable warning if not checking
+        (void)err;  // チェックしない場合の未使用変数警告を抑制
 
-        // Set NoData value
+        // NoData値を設定
         pImpl->dataset->GetRasterBand(1)->SetNoDataValue(-9999.0);
     }
 }
@@ -200,11 +200,11 @@ bool GeoTiff::create(std::string_view output_epsg, bool rgbify, std::error_code 
         return false;
     }
 
-    // Set geotransform
+    // ジオ変換を設定
     pImpl->dataset->SetGeoTransform(pImpl->geo_transform.data());
 
-    // Set projection - ALWAYS use EPSG:4326 initially (geo_transform is in
-    // lat/lon)
+    // 投影法を設定 - 常に最初はEPSG:4326を使用 (geo_transformは
+    // 緯度/経度形式)
     OGRSpatialReference srs;
     srs.importFromEPSG(4326);
 
@@ -213,7 +213,7 @@ bool GeoTiff::create(std::string_view output_epsg, bool rgbify, std::error_code 
     pImpl->dataset->SetProjection(wkt);
     CPLFree(wkt);
 
-    // Write raster bands
+    // ラスターバンドを書き込み
     write_raster_bands(rgbify);
 
     GDALClose(pImpl->dataset);
@@ -223,18 +223,18 @@ bool GeoTiff::create(std::string_view output_epsg, bool rgbify, std::error_code 
 }
 
 bool GeoTiff::resampling(std::string_view output_epsg, std::error_code &ec) {
-    // Create temporary output path
+    // 一時出力パスを作成
     std::filesystem::path temp_path = pImpl->output_path;
     temp_path.replace_extension(".tmp.tif");
 
-    // Setup warp options using GDALWarpAppOptions
+    // GDALWarpAppOptionsを使用してワープオプションを設定
     GDALWarpAppOptions *warp_opts = GDALWarpAppOptionsNew(nullptr, nullptr);
 
-    // Set source and destination SRS
+    // ソースと出力先のSRSを設定
     std::string src_srs = "EPSG:4326";
     std::string dst_srs = std::string(output_epsg);
 
-    // Setup warp options
+    // ワープオプションを設定
     char *src_srs_str = const_cast<char *>(src_srs.c_str());
     char *dst_srs_str = const_cast<char *>(dst_srs.c_str());
 
@@ -254,7 +254,7 @@ bool GeoTiff::resampling(std::string_view output_epsg, std::error_code &ec) {
     warp_opts = GDALWarpAppOptionsNew(argv, nullptr);
     CSLDestroy(argv);
 
-    // Open source dataset
+    // ソースデータセットを開く
     GDALDataset *src_datasets[1];
     src_datasets[0] =
         static_cast<GDALDataset *>(GDALOpen(pImpl->output_path.string().c_str(), GA_ReadOnly));
@@ -265,7 +265,7 @@ bool GeoTiff::resampling(std::string_view output_epsg, std::error_code &ec) {
         return false;
     }
 
-    // Perform the warp
+    // ワープを実行
     int error = 0;
     GDALDataset *warped_dataset = static_cast<GDALDataset *>(
         GDALWarp(temp_path.string().c_str(), nullptr, 1,
@@ -283,7 +283,7 @@ bool GeoTiff::resampling(std::string_view output_epsg, std::error_code &ec) {
 
     GDALClose(warped_dataset);
 
-    // Replace original with resampled
+    // 元のファイルをリサンプリングしたファイルで置換
     std::filesystem::remove(pImpl->output_path);
     std::filesystem::rename(temp_path, pImpl->output_path);
 

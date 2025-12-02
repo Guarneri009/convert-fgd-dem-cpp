@@ -9,12 +9,12 @@ namespace fgd_converter::xml {
 class XmlParser::Impl {
    public:
     explicit Impl(std::string_view xml_content) {
-        // Use the ultra-fast one-pass parser
+        // 超高速1パスパーサーを使用
         auto parsed = FastFGDParser::parse_all(xml_content, true);
         if (parsed) {
             data = *parsed;
         } else {
-            // If parsing fails, throw an exception
+            // パースに失敗した場合は例外をスロー
             throw std::runtime_error("Failed to parse XML content");
         }
     }
@@ -60,7 +60,7 @@ auto XmlParser::get_start_point() const -> std::optional<StartPoint> {
 auto XmlParser::get_tuple_list(std::error_code &ec) const
     -> std::optional<std::vector<std::vector<double>>> {
     if (pImpl->data.has_tuple_list) {
-        // Return as a 2D vector with a single row for compatibility
+        // 互換性のため単一行の2Dベクターとして返す
         return std::vector<std::vector<double>>{pImpl->data.elevation_list};
     }
     ec = std::make_error_code(std::errc::invalid_argument);
@@ -87,7 +87,7 @@ auto XmlParser::extract_file_name(std::string_view xml_path) -> std::string {
 }
 
 auto XmlParser::validate_xml(std::string_view xml_content) -> bool {
-    // Use FastFGDParser to validate
+    // FastFGDParserを使用して検証
     auto result = FastFGDParser::parse_all(xml_content, true);
     return result.has_value();
 }
