@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build-msvc:
     name: build (windows-x64-msvc)
@@ -45,24 +48,24 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cmake --preset windows-ninja-release
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
     - name: Build
       run: |
-        cmake --build build-ninja --config Release
+        cmake --build build --config Release
 
     - name: Check executable
       run: |
         Write-Host "=== File info ==="
-        Get-ChildItem build-ninja\convert_fgd_dem_cpp.exe | Format-Table Name, Length
+        Get-ChildItem build\convert_fgd_dem_cpp.exe | Format-Table Name, Length
         Write-Host ""
         Write-Host "=== Dependencies (dumpbin) ==="
-        dumpbin /dependents build-ninja\convert_fgd_dem_cpp.exe
+        dumpbin /dependents build\convert_fgd_dem_cpp.exe
 
     - name: Test executable
       run: |
         Write-Host "=== Testing executable ==="
-        .\build-ninja\convert_fgd_dem_cpp.exe --help
+        .\build\convert_fgd_dem_cpp.exe --help
         Write-Host "Executable runs successfully!"
 
     - name: Prepare artifacts
@@ -72,7 +75,7 @@ jobs:
         New-Item -ItemType Directory -Force -Path artifacts
 
         # Copy executable
-        Copy-Item build-ninja\convert_fgd_dem_cpp.exe artifacts\
+        Copy-Item build\convert_fgd_dem_cpp.exe artifacts\
 
         # Copy GDAL data files from vcpkg_installed
         $vcpkgInstalled = "vcpkg_installed\x64-windows-static"
@@ -107,7 +110,7 @@ jobs:
       with:
         name: build-logs-x64-windows
         path: |
-          build-ninja/**/*.log
+          build/**/*.log
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
