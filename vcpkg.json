@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "convert-fgd-dem-cpp",
+  "version": "1.0.0",
+  "description": "FGD DEM to GeoTIFF converter",
+  "dependencies": [
+    "tiff",
+    "libgeotiff",
+    "proj",
+    "tbb"
+  ],
+  "overrides": [],
+  "builtin-baseline": "1ee2e9d2920ba96be0b02c09915dd3c6d17fb50e"
+}

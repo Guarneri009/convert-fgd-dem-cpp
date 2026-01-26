@@ -1,0 +1,140 @@
+name: macOS Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-macos:
+    name: build (macos-arm64)
+    runs-on: macos-14
+
+    env:
+      VCPKG_DEFAULT_TRIPLET: arm64-osx
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Install system dependencies
+      run: |
+        brew install cmake ninja pkg-config autoconf autoconf-archive automake libtool
+
+    - name: Cache vcpkg packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/vcpkg
+          vcpkg_installed
+        key: vcpkg-macos-arm64-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-macos-arm64-
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: '1ee2e9d2920ba96be0b02c09915dd3c6d17fb50e'
+        runVcpkgInstall: true
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=arm64-osx \
+          -DVCPKG_INSTALLED_DIR=$PWD/vcpkg_installed
+
+    - name: Build
+      run: |
+        cmake --build build --config Release
+
+    - name: Check executable
+      run: |
+        echo "=== File info ==="
+        ls -lh build/convert_fgd_dem_cpp
+        echo ""
+        echo "=== Dependencies (otool) ==="
+        otool -L build/convert_fgd_dem_cpp || true
+        echo ""
+        echo "=== File type ==="
+        file build/convert_fgd_dem_cpp
+        echo ""
+        echo "=== Architecture ==="
+        lipo -info build/convert_fgd_dem_cpp
+
+    - name: Test executable
+      run: |
+        echo "=== Testing executable ==="
+        ./build/convert_fgd_dem_cpp --help
+        echo "Executable runs successfully!"
+
+    - name: Prepare artifacts
+      run: |
+        echo "=== Preparing artifacts ==="
+
+        mkdir -p artifacts
+
+        # Copy executable
+        cp build/convert_fgd_dem_cpp artifacts/
+
+        # Copy GDAL data files from vcpkg_installed
+        VCPKG_INSTALLED="vcpkg_installed/arm64-osx"
+
+        if [ -d "$VCPKG_INSTALLED/share/gdal" ]; then
+          cp -r "$VCPKG_INSTALLED/share/gdal" artifacts/gdal-data
+          echo "Copied GDAL data files"
+        fi
+
+        # Copy PROJ data files from vcpkg_installed
+        if [ -d "$VCPKG_INSTALLED/share/proj" ]; then
+          cp -r "$VCPKG_INSTALLED/share/proj" artifacts/proj-data
+          echo "Copied PROJ data files"
+        fi
+
+        # Copy documentation
+        [ -f README.md ] && cp README.md artifacts/
+        [ -f LICENSE ] && cp LICENSE artifacts/
+
+        echo ""
+        echo "=== Final artifacts summary ==="
+        echo "Executable:"
+        ls -lh artifacts/convert_fgd_dem_cpp
+        echo ""
+        echo "Total size:"
+        du -sh artifacts/
+
+    - name: Upload build logs
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: build-logs-macos-arm64
+        path: |
+          build/**/*.log
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: convert-fgd-dem-cpp-macos-arm64
+        path: artifacts/
+        retention-days: 30
+
+    - name: Create Release Archive
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd artifacts
+        tar -czvf ../convert-fgd-dem-cpp-macos-arm64.tar.gz *
+
+    - name: Upload Release Asset
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: convert-fgd-dem-cpp-macos-arm64.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
