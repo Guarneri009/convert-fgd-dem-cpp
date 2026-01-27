@@ -14,6 +14,8 @@ jobs:
   build-msvc:
     name: build (windows-x64-msvc)
     runs-on: windows-2022
+    permissions:
+      contents: write
 
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
